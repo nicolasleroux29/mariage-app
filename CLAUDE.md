@@ -144,9 +144,9 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ## 8. Ce qui reste à faire ❌
 
 ### Côté invité (public)
-- [ ] Page `/rsvp/[token]` — formulaire RSVP pré-rempli
-- [ ] Route `POST /api/rsvp` — enregistrement des réponses
-- [ ] Modification de réponse possible via le même lien
+- [x] Page `/rsvp/[token]` — formulaire RSVP pré-rempli
+- [x] Route `POST /api/rsvp` — enregistrement des réponses
+- [x] Modification de réponse possible via le même lien
 - [ ] Page d'accueil publique (Yann & Judith, photo, compte à rebours)
 - [ ] Page "Le mariage" (lieux, horaires, maps)
 - [ ] Page "Présentation" (témoins, texte)

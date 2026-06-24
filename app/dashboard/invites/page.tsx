@@ -133,6 +133,8 @@ export default function InvitesPage() {
                 <th className="px-4 py-3 text-left">Vin</th>
                 <th className="px-4 py-3 text-left">Repas</th>
                 <th className="px-4 py-3 text-left">Retour</th>
+                <th className="px-4 py-3 text-left">Enfants</th>
+                <th className="px-4 py-3 text-left">Nb</th>
                 <th className="px-4 py-3 text-left">Lien</th>
               </tr>
             </thead>
@@ -148,6 +150,8 @@ export default function InvitesPage() {
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.vinHonneur ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.repas ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.retourNoce ? '✅' : '❌') : '—'}</td>
+                    <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.enfants ? '✅' : '❌') : '—'}</td>
+                    <td className="px-4 py-3">{invite.rsvp?.enfants ? (invite.rsvp.nbEnfants ?? '?') : '—'}</td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => copierLien(invite.token)}
