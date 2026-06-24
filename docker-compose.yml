@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: mariage_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mariage
+      POSTGRES_PASSWORD: mariage_dev
+      POSTGRES_DB: mariage
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

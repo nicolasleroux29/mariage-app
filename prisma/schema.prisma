@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Invite {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  prenom    String
+  email     String?
+  token     String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+
+  rsvp Rsvp?
+}
+
+model Rsvp {
+  id         Int      @id @default(autoincrement())
+  inviteId   Int      @unique
+  invite     Invite   @relation(fields: [inviteId], references: [id])
+  eglise     Boolean?
+  vinHonneur Boolean?
+  repas      Boolean?
+  retourNoce Boolean?
+  enfants    Boolean?
+  nbEnfants  Int?
+  allergies  String?
+  submittedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
