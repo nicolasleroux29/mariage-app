@@ -89,7 +89,19 @@ export default function InvitesPage() {
   }
 
   async function copierLien(token: string) {
-    await navigator.clipboard.writeText(getLien(token))
+    const lien = getLien(token)
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(lien)
+    } else {
+      const el = document.createElement('textarea')
+      el.value = lien
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
     setCopiedToken(token)
     setTimeout(() => setCopiedToken(null), 2000)
   }

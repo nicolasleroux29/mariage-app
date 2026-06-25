@@ -13,7 +13,7 @@ export async function GET() {
     'Enfants', 'Nb enfants', 'Allergies'
   ].join(';')
 
-  const rows = invites.map(invite => [
+  const rows = invites.map((invite: (typeof invites)[number]) => [
     invite.prenom,
     invite.nom,
     invite.email ?? '',

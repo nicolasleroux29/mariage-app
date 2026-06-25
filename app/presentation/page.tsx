@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import PublicHeader from '@/components/PublicHeader'
 
 const temoins = [
@@ -47,9 +48,14 @@ export default function PresentationPage() {
           <section>
             <h2 className="text-xl font-medium text-gray-700 mb-8">Yann &amp; Judith</h2>
             <div className="flex flex-col sm:flex-row gap-8 items-start">
-              {/* Photo placeholder — remplacer par <Image src="..." /> */}
-              <div className="w-full sm:w-48 h-48 rounded-2xl bg-pink-100 flex-shrink-0 flex items-center justify-center">
-                <span className="text-pink-300 text-2xl font-light tracking-widest">Y &amp; J</span>
+              <div className="w-full sm:w-48 h-48 rounded-2xl overflow-hidden flex-shrink-0 shadow-sm">
+                <Image
+                  src="/optimizedyannjudith.png"
+                  alt="Yann & Judith"
+                  width={192}
+                  height={192}
+                  className="object-cover w-full h-full"
+                />
               </div>
               <div className="flex flex-col gap-4 text-sm text-gray-500 leading-relaxed">
                 <p>

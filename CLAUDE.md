@@ -1,5 +1,5 @@
 # Projet Site Web Mariage — Yann & Judith
-## Documentation technique — État au 24 juin 2026
+## Documentation technique — État au 25 juin 2026
 
 ---
 
@@ -164,11 +164,12 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Suppression / modification d'un invité
 
 ### Déploiement
-- [ ] Supprimer les `console.log` de credentials dans `app/api/auth/login/route.ts` (lignes 10-13)
-- [ ] Configuration VPS OVH
-- [ ] Mise en place HTTPS / nom de domaine
-- [ ] Variables d'environnement production
-- [ ] Pipeline de déploiement
+- [x] Configuration VPS OVH (VPS Starter Debian, PM2 + nginx)
+- [x] PostgreSQL 16 installé nativement sur le VPS
+- [x] Application déployée et accessible en HTTP
+- [ ] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts` (ajoutés temporairement pour diagnostiquer le hash bcrypt)
+- [ ] Mise en place HTTPS (voir checklist section 11)
+- [ ] Contenu à compléter par les mariés (témoins, hébergements, FAQ, texte de présentation)
 
 ---
 
@@ -177,13 +178,71 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ```env
 DATABASE_URL="postgresql://mariage:mariage_dev@localhost:5432/mariage"
 ADMIN_EMAIL="..."
-ADMIN_PASSWORD_HASH="..."   # bcrypt, échapper les $ avec \$
-JWT_SECRET="..."            # 32 bytes hex aléatoires
+ADMIN_PASSWORD_HASH=\$2b\$10\$...   # bcrypt — échapper TOUS les $ avec \$ (pas de guillemets)
+JWT_SECRET="..."                     # 32 bytes hex : node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+RESEND_API_KEY="re_..."
+RESEND_FROM="Yann & Judith <onboarding@resend.dev>"   # → changer avec le vrai domaine en prod HTTPS
+NEXT_PUBLIC_BASE_URL="http://IP_VPS:3000"             # → changer en https://domaine.fr lors du passage HTTPS
+HTTPS="false"                                          # → passer à "true" lors du passage HTTPS
+```
+
+**Génération du hash bcrypt :**
+```bash
+node -e "require('bcryptjs').hash('MonMotDePasse', 10).then(h => console.log(h))"
+# Copier le résultat dans .env en échappant chaque $ avec \$
+# Exemple : $2b$10$xxx → \$2b\$10\$xxx
 ```
 
 ---
 
-## 10. Commandes utiles
+## 10. État HTTP actuel (temporaire)
+
+Le site tourne en HTTP sur le VPS en attendant l'achat du domaine et la mise en place de HTTPS.
+Deux adaptations ont été faites spécifiquement pour fonctionner sans HTTPS :
+
+| Fichier | Modification | Comportement HTTPS |
+|---|---|---|
+| `app/api/auth/login/route.ts` | `secure: process.env.HTTPS === 'true'` | Le cookie session sera `secure` quand `HTTPS=true` dans `.env` |
+| `app/dashboard/invites/page.tsx` | Fallback `execCommand` si `clipboard.writeText` indisponible | `clipboard.writeText` sera utilisé automatiquement en HTTPS |
+
+Ces modifications sont **permanentes et compatibles HTTPS** — rien à revertir, il suffira d'activer `HTTPS=true`.
+
+---
+
+## 11. Checklist passage en HTTPS
+
+À faire quand le domaine est acheté et les DNS configurés :
+
+### DNS & Certificat
+- [ ] Acheter le nom de domaine
+- [ ] Pointer le domaine vers l'IP du VPS (enregistrement A)
+- [ ] Installer certbot : `sudo apt install certbot python3-certbot-nginx`
+- [ ] Générer le certificat : `sudo certbot --nginx -d domaine.fr`
+- [ ] Vérifier le renouvellement automatique : `sudo certbot renew --dry-run`
+
+### Variables d'environnement (sur le VPS, dans `.env`)
+- [ ] `NEXT_PUBLIC_BASE_URL` → `https://domaine.fr`
+- [ ] `HTTPS` → `true`
+- [ ] `RESEND_FROM` → `Yann & Judith <contact@domaine.fr>` (après vérification domaine dans Resend)
+
+### Resend
+- [ ] Ajouter et vérifier le domaine dans le dashboard Resend
+- [ ] Mettre à jour `RESEND_FROM` dans `.env`
+
+### Code
+- [ ] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
+
+### Déploiement
+- [ ] `npm run build` sur le VPS
+- [ ] `pm2 restart mariage-app`
+- [ ] Tester la connexion dashboard (cookie secure)
+- [ ] Tester un RSVP (email de confirmation avec lien https)
+- [ ] Tester la copie de lien (clipboard API)
+- [ ] Vérifier que HTTP redirige vers HTTPS (nginx)
+
+---
+
+## 12. Commandes utiles
 
 ```bash
 npx prisma studio          # Interface visuelle de la base (localhost:5555)

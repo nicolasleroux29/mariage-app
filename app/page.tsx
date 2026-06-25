@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import PublicHeader from '@/components/PublicHeader'
 import Countdown from '@/components/Countdown'
 
@@ -7,9 +8,15 @@ export default function HomePage() {
       <PublicHeader />
       <main>
         <section className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center bg-gradient-to-b from-pink-50 to-white px-4 text-center">
-          {/* Remplacer par une vraie photo — ex: <Image src="/photo-couple.jpg" ... /> */}
-          <div className="w-36 h-36 rounded-full bg-pink-100 mb-10 flex items-center justify-center">
-            <span className="text-pink-300 text-2xl font-light tracking-widest">Y &amp; J</span>
+          <div className="w-36 h-36 rounded-full overflow-hidden mb-10 shadow-sm">
+            <Image
+              src="/optimizedyannjudith.png"
+              alt="Yann & Judith"
+              width={144}
+              height={144}
+              className="object-cover w-full h-full"
+              priority
+            />
           </div>
 
           <h1 className="text-5xl font-light tracking-wide text-gray-700 mb-2">
