@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { sendRsvpConfirmation, sendRsvpNotification } from '@/lib/emails'
 
 export async function POST(req: NextRequest) {
-  const { token, eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, allergies } = await req.json()
+  const { token, eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, allergies, email } = await req.json()
 
   if (!token) {
     return NextResponse.json({ error: 'Token manquant' }, { status: 400 })
@@ -21,19 +21,24 @@ export async function POST(req: NextRequest) {
   const isUpdate = invite.rsvp !== null
   const rsvpData = { eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, allergies }
 
-  const rsvp = await prisma.rsvp.upsert({
-    where: { inviteId: invite.id },
-    create: { inviteId: invite.id, ...rsvpData },
-    update: rsvpData,
-  })
+  const [rsvp] = await Promise.all([
+    prisma.rsvp.upsert({
+      where: { inviteId: invite.id },
+      create: { inviteId: invite.id, ...rsvpData },
+      update: rsvpData,
+    }),
+    email ? prisma.invite.update({ where: { id: invite.id }, data: { email } }) : Promise.resolve(),
+  ])
+
+  const confirmationEmail = email ?? invite.email
 
   // Envoi des emails en arrière-plan — ne bloque pas la réponse
   const emailPromises = [
     sendRsvpNotification(invite, rsvpData, isUpdate),
   ]
-  if (invite.email) {
+  if (confirmationEmail) {
     emailPromises.push(sendRsvpConfirmation(
-      { prenom: invite.prenom, nom: invite.nom, email: invite.email, token: invite.token },
+      { prenom: invite.prenom, nom: invite.nom, email: confirmationEmail, token: invite.token },
       rsvpData
     ))
   }

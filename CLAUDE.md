@@ -160,8 +160,8 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Notification email aux mariés à chaque nouveau RSVP / modification
 
 ### Dashboard
-- [ ] Envoi du lien par email depuis le dashboard
-- [ ] Suppression / modification d'un invité
+- [x] Liens distribués via QR code imprimé — pas d'envoi par email depuis le dashboard
+- [x] Suppression / modification d'un invité
 
 ### Déploiement
 - [ ] Supprimer les `console.log` de credentials dans `app/api/auth/login/route.ts` (lignes 10-13)

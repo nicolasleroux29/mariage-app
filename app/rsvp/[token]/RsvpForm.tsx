@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PublicHeader from '@/components/PublicHeader'
 
 type Rsvp = {
@@ -74,13 +74,21 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
   const [enfants, setEnfants] = useState<boolean | null>(existing?.enfants ?? null)
   const [nbEnfants, setNbEnfants] = useState<string>(existing?.nbEnfants?.toString() ?? '')
   const [allergies, setAllergies] = useState<string>(existing?.allergies ?? '')
+  const [email, setEmail] = useState<string>(invite.email ?? '')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const confirmationRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     localStorage.setItem('rsvp_token', invite.token)
   }, [invite.token])
+
+  useEffect(() => {
+    if (submitted) {
+      confirmationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [submitted])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -99,6 +107,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         enfants,
         nbEnfants: enfants && nbEnfants ? parseInt(nbEnfants, 10) : null,
         allergies: allergies.trim() || null,
+        email: email.trim() || null,
       }),
     })
 
@@ -134,7 +143,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         </div>
 
         {submitted && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 text-center">
+          <div ref={confirmationRef} className="scroll-mt-24 bg-green-50 border border-green-200 rounded-2xl p-6 mb-6 text-center">
             <p className="text-green-600 font-medium text-lg">Réponse enregistrée !</p>
             <p className="text-green-500 text-sm mt-1">
               Merci {invite.prenom}, nous avons bien reçu votre réponse.
@@ -209,6 +218,18 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
                 />
               </div>
             )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <p className="font-medium text-gray-700 mb-1">Votre adresse email</p>
+            <p className="text-sm text-gray-400 mb-4">Pour recevoir la confirmation de votre réponse</p>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="prenom.nom@email.com"
+              className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-pink-300"
+            />
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm p-6">

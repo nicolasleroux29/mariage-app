@@ -30,6 +30,11 @@ export default function InvitesPage() {
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
+  const [editInvite, setEditInvite] = useState<Invite | null>(null)
+  const [editNom, setEditNom] = useState('')
+  const [editPrenom, setEditPrenom] = useState('')
+  const [editEmail, setEditEmail] = useState('')
+  const [editSubmitting, setEditSubmitting] = useState(false)
 
   async function fetchInvites() {
     const res = await fetch('/api/invites')
@@ -43,17 +48,39 @@ export default function InvitesPage() {
   async function handleAjout() {
     if (!nom || !prenom) return
     setSubmitting(true)
-
     await fetch('/api/invites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nom, prenom, email })
     })
-
-    setNom('')
-    setPrenom('')
-    setEmail('')
+    setNom(''); setPrenom(''); setEmail('')
     setSubmitting(false)
+    fetchInvites()
+  }
+
+  function openEdit(invite: Invite) {
+    setEditInvite(invite)
+    setEditNom(invite.nom)
+    setEditPrenom(invite.prenom)
+    setEditEmail(invite.email ?? '')
+  }
+
+  async function handleEdit() {
+    if (!editInvite || !editNom || !editPrenom) return
+    setEditSubmitting(true)
+    await fetch(`/api/invites/${editInvite.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nom: editNom, prenom: editPrenom, email: editEmail || null }),
+    })
+    setEditInvite(null)
+    setEditSubmitting(false)
+    fetchInvites()
+  }
+
+  async function handleDelete(invite: Invite) {
+    if (!window.confirm(`Supprimer ${invite.prenom} ${invite.nom} ? Cette action est irréversible.`)) return
+    await fetch(`/api/invites/${invite.id}`, { method: 'DELETE' })
     fetchInvites()
   }
 
@@ -75,15 +102,15 @@ export default function InvitesPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-    <h1 className="text-2xl font-semibold text-pink-400">Invités</h1>
-    
-    <a    href="/api/invites/export"
-        className="bg-white border border-pink-300 text-pink-400 rounded-lg px-4 py-2 text-sm font-medium hover:bg-pink-50 transition"
-    >
-        Exporter CSV
-    </a>
-    </div>
-      
+        <h1 className="text-2xl font-semibold text-pink-400">Invités</h1>
+        <a
+          href="/api/invites/export"
+          className="bg-white border border-pink-300 text-pink-400 rounded-lg px-4 py-2 text-sm font-medium hover:bg-pink-50 transition"
+        >
+          Exporter CSV
+        </a>
+      </div>
+
       {/* Formulaire ajout */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Ajouter un invité</h2>
@@ -136,6 +163,7 @@ export default function InvitesPage() {
                 <th className="px-4 py-3 text-left">Enfants</th>
                 <th className="px-4 py-3 text-left">Nb</th>
                 <th className="px-4 py-3 text-left">Lien</th>
+                <th className="px-4 py-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -160,6 +188,22 @@ export default function InvitesPage() {
                         {copiedToken === invite.token ? '✓ Copié !' : 'Copier le lien'}
                       </button>
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => openEdit(invite)}
+                          className="text-gray-400 hover:text-gray-600 transition text-xs font-medium"
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          onClick={() => handleDelete(invite)}
+                          className="text-red-400 hover:text-red-600 transition text-xs font-medium"
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 )
               })}
@@ -167,6 +211,53 @@ export default function InvitesPage() {
           </table>
         )}
       </div>
+
+      {/* Modale d'édition */}
+      {editInvite && (
+        <div
+          className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4"
+          onClick={e => { if (e.target === e.currentTarget) setEditInvite(null) }}
+        >
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-medium text-gray-700 mb-5">Modifier l&apos;invité</h2>
+            <div className="flex flex-col gap-3">
+              <input
+                placeholder="Prénom"
+                value={editPrenom}
+                onChange={e => setEditPrenom(e.target.value)}
+                className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
+              />
+              <input
+                placeholder="Nom"
+                value={editNom}
+                onChange={e => setEditNom(e.target.value)}
+                className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
+              />
+              <input
+                placeholder="Email (optionnel)"
+                value={editEmail}
+                onChange={e => setEditEmail(e.target.value)}
+                className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
+              />
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setEditInvite(null)}
+                className="flex-1 border border-gray-200 text-gray-500 rounded-lg py-2 text-sm hover:bg-gray-50 transition"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleEdit}
+                disabled={editSubmitting || !editNom || !editPrenom}
+                className="flex-1 bg-pink-400 text-white rounded-lg py-2 text-sm font-medium hover:bg-pink-500 transition disabled:opacity-50"
+              >
+                {editSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

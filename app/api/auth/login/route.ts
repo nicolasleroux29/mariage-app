@@ -7,11 +7,6 @@ const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
 
-  console.log('EMAIL ENV:', process.env.ADMIN_EMAIL)
-  console.log('HASH ENV:', process.env.ADMIN_PASSWORD_HASH)
-  console.log('EMAIL RECU:', email)
-  console.log('PASSWORD RECU:', password)
-  
   // Vérifie email
   if (email !== process.env.ADMIN_EMAIL) {
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
