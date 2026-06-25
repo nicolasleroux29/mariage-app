@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Yann & Judith — 19 juin 2027",
   description: "Site du mariage de Yann & Judith",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
