@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const totalInvites = await prisma.invite.count()
   const totalReponses = await prisma.rsvp.count()
