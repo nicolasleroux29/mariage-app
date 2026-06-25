@@ -16,6 +16,7 @@ type Rsvp = {
 type Invite = {
   nom: string
   prenom: string
+  email: string | null
   token: string
   rsvp: Rsvp | null
 }
