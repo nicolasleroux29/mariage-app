@@ -147,23 +147,24 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Page `/rsvp/[token]` — formulaire RSVP pré-rempli
 - [x] Route `POST /api/rsvp` — enregistrement des réponses
 - [x] Modification de réponse possible via le même lien
-- [ ] Page d'accueil publique (Yann & Judith, photo, compte à rebours)
-- [ ] Page "Le mariage" (lieux, horaires, maps)
-- [ ] Page "Présentation" (témoins, texte)
-- [ ] Page "Informations pratiques" (hébergements, transport, dress code)
-- [ ] Page "FAQ"
-- [ ] Page "Contact"
+- [x] Page d'accueil publique (Yann & Judith, photo, compte à rebours)
+- [x] Page "Le mariage" (lieux, horaires, maps)
+- [x] Page "Présentation" (témoins, texte)
+- [x] Page "Informations pratiques" (hébergements, transport, dress code)
+- [x] Page "FAQ" (anciennement "Informations pratiques", route `/faq`)
+- [x] Contact mariés intégré dans la page "Le Mariage" (pas de page dédiée)
 
 ### Emails
-- [ ] Intégration Resend ou Brevo
-- [ ] Email de confirmation automatique à l'invité après RSVP
-- [ ] Notification email aux mariés à chaque nouveau RSVP
+- [x] Intégration Resend
+- [x] Email de confirmation automatique à l'invité après RSVP (si email renseigné)
+- [x] Notification email aux mariés à chaque nouveau RSVP / modification
 
 ### Dashboard
 - [ ] Envoi du lien par email depuis le dashboard
 - [ ] Suppression / modification d'un invité
 
 ### Déploiement
+- [ ] Supprimer les `console.log` de credentials dans `app/api/auth/login/route.ts` (lignes 10-13)
 - [ ] Configuration VPS OVH
 - [ ] Mise en place HTTPS / nom de domaine
 - [ ] Variables d'environnement production

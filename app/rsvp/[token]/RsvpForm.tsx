@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import PublicHeader from '@/components/PublicHeader'
 
 type Rsvp = {
   eglise: boolean | null
@@ -77,6 +78,10 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    localStorage.setItem('rsvp_token', invite.token)
+  }, [invite.token])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
@@ -107,6 +112,8 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
   }
 
   return (
+    <>
+    <PublicHeader />
     <main className="min-h-screen bg-pink-50 py-10 px-4">
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
@@ -139,13 +146,13 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <ToggleField
             label="Cérémonie religieuse"
-            description="Samedi 19 juin 2027 — 11h00"
+            description="Samedi 19 juin 2027 — 14h30"
             value={eglise}
             onChange={setEglise}
           />
           <ToggleField
             label="Vin d'honneur"
-            description="Samedi 19 juin 2027 — 17h00"
+            description="Samedi 19 juin 2027 — 17h30"
             value={vinHonneur}
             onChange={setVinHonneur}
           />
@@ -236,5 +243,6 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         </p>
       </div>
     </main>
+    </>
   )
 }

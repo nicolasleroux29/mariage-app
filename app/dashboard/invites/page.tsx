@@ -58,7 +58,7 @@ export default function InvitesPage() {
   }
 
   function getLien(token: string) {
-    return `${window.location.origin}/rsvp/${token}`
+    return `${window.location.origin}/invite/${token}`
   }
 
   async function copierLien(token: string) {

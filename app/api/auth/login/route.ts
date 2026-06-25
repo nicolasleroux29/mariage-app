@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   // Génère le JWT
   const token = await new SignJWT({ role: 'admin' })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('7d')
+    .setExpirationTime('24h')
     .sign(SECRET)
 
   // Pose le cookie de session
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24, // 24 heures
   })
 
   return response
