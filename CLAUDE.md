@@ -1,5 +1,5 @@
 # Projet Site Web Mariage — Yann & Judith
-## Documentation technique — État au 25 juin 2026
+## Documentation technique — État au 26 juin 2026
 
 ---
 
@@ -118,10 +118,11 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 
 - **Route :** `POST /api/auth/login`
 - **Credentials :** stockés dans `.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`)
-- **Session :** cookie `session` httpOnly, JWT signé HS256, expiration 7 jours
+- **Session :** cookie `session` httpOnly, JWT signé HS256, expiration 24h
 - **Protection :** middleware Next.js sur toutes les routes `/dashboard/*`
-- **Génération du hash :** `node -e "const b = require('bcryptjs'); b.hash('motdepasse', 10).then(h => process.stdout.write(h))" > /tmp/hash.txt`
-- **Attention :** échapper les `$` du hash dans `.env` avec `\$`
+- **Génération du hash :** `node -e "require('bcryptjs').hash('MonMotDePasse', 10).then(h => console.log(h))"`
+- **Attention :** échapper TOUS les `$` du hash dans `.env` avec `\$`, sans guillemets autour de la valeur
+- **Cookie secure :** contrôlé par `HTTPS=true` dans `.env` (pas par NODE_ENV)
 
 ---
 
@@ -167,6 +168,9 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Configuration VPS OVH (VPS Starter Debian, PM2 + nginx)
 - [x] PostgreSQL 16 installé nativement sur le VPS
 - [x] Application déployée et accessible en HTTP
+- [x] Pages dashboard (synthèse + allergies) forcées en rendu dynamique (`force-dynamic`)
+- [x] Photos exclues du repo git (gérées manuellement via `scp` sur le VPS)
+- [ ] Uploader la photo des mariés sur le VPS : `scp public/optimizedyannjudith.png debian@IP_VPS:~/mariage-app/public/`
 - [ ] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts` (ajoutés temporairement pour diagnostiquer le hash bcrypt)
 - [ ] Mise en place HTTPS (voir checklist section 11)
 - [ ] Contenu à compléter par les mariés (témoins, hébergements, FAQ, texte de présentation)
@@ -245,9 +249,20 @@ Ces modifications sont **permanentes et compatibles HTTPS** — rien à revertir
 ## 12. Commandes utiles
 
 ```bash
+# Dev local (WSL2)
+docker compose up -d       # Démarrer PostgreSQL
+npm run dev                # Lancer Next.js sur localhost:3000
 npx prisma studio          # Interface visuelle de la base (localhost:5555)
 npx prisma migrate dev     # Appliquer une nouvelle migration
 npx prisma generate        # Régénérer le client après modif schéma
-docker compose up -d       # Démarrer PostgreSQL
-docker compose down        # Stopper PostgreSQL
+
+# VPS (production)
+npm run build              # Build (inclut prisma generate)
+pm2 restart mariage-app    # Redémarrer l'application
+pm2 logs mariage-app       # Voir les logs en temps réel
+git pull && npm run build && pm2 restart mariage-app   # Déployer une mise à jour
+git checkout -- . && git pull                          # Annuler les changements locaux et puller
+
+# Upload de la photo des mariés sur le VPS
+scp public/optimizedyannjudith.png debian@IP_VPS:~/mariage-app/public/
 ```
