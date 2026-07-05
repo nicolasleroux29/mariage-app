@@ -52,23 +52,23 @@ export default function MariagePage() {
       <main className="bg-white min-h-screen">
 
         {/* Hero */}
-        <section className="bg-pink-50 py-16 px-4 text-center">
+        <section className="bg-pink-50 py-24 sm:py-32 px-4 text-center">
           <p className="text-pink-400 text-sm uppercase tracking-widest mb-3">Samedi 19 juin 2027</p>
-          <h1 className="text-4xl font-light text-gray-700">Le Mariage</h1>
+          <h1 className="text-4xl font-light text-gray-700 font-serif">Le Mariage</h1>
         </section>
 
-        <div className="max-w-2xl mx-auto px-4 py-16 flex flex-col gap-16">
+        <div className="max-w-2xl mx-auto px-4 py-24 flex flex-col gap-24">
 
           {/* Programme */}
           <section>
-            <h2 className="text-xl font-medium text-gray-700 mb-8">Programme de la journée</h2>
-            <ol className="relative border-l border-pink-100 flex flex-col gap-8 pl-6">
+            <h2 className="text-xl font-medium text-gray-700 mb-8 font-serif">Programme de la journée</h2>
+            <ol className="relative border-l border-pink-100 flex flex-col gap-10 pl-6">
               {programme.map((item, i) => (
                 <li key={i} className="relative">
                   <span className="absolute -left-[25px] w-4 h-4 rounded-full bg-pink-200 border-2 border-white" />
                   <span className="text-xs font-medium text-pink-400 uppercase tracking-widest">{item.heure}</span>
                   <h3 className="text-base font-medium text-gray-700 mt-1">{item.titre}</h3>
-                  <p className="text-sm text-gray-400 mt-0.5">{item.description}</p>
+                  <p className="text-base text-gray-500 mt-1 leading-relaxed">{item.description}</p>
                 </li>
               ))}
             </ol>
@@ -76,13 +76,13 @@ export default function MariagePage() {
 
           {/* Lieux */}
           <section>
-            <h2 className="text-xl font-medium text-gray-700 mb-6">Les lieux</h2>
+            <h2 className="text-xl font-medium text-gray-700 mb-6 font-serif">Les lieux</h2>
             <div className="flex flex-col gap-4">
               {lieux.map((lieu, i) => (
-                <div key={i} className="bg-pink-50 rounded-2xl p-6">
+                <div key={i} className="bg-pink-50 rounded-2xl p-8">
                   <p className="text-xs text-pink-400 uppercase tracking-widest mb-1">{lieu.type}</p>
                   <h3 className="text-base font-medium text-gray-700">{lieu.nom}</h3>
-                  <p className="text-sm text-gray-400 mt-1">{lieu.adresse}<br />{lieu.ville}</p>
+                  <p className="text-base text-gray-500 mt-2">{lieu.adresse}<br />{lieu.ville}</p>
                   <a
                     href={lieu.mapsUrl}
                     target="_blank"
@@ -98,8 +98,8 @@ export default function MariagePage() {
 
           {/* Contact */}
           <section>
-            <h2 className="text-xl font-medium text-gray-700 mb-6">Pour toutes vos questions</h2>
-            <div className="bg-pink-50 rounded-2xl p-6 flex flex-col sm:flex-row gap-4">
+            <h2 className="text-xl font-medium text-gray-700 mb-6 font-serif">Pour toutes vos questions</h2>
+            <div className="bg-pink-50 rounded-2xl p-8 flex flex-col sm:flex-row gap-4">
               <a
                 href="tel:0610324060"
                 className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
