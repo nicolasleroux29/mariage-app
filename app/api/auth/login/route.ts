@@ -7,20 +7,13 @@ const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
 
-  console.log('[login] email reçu:', email)
-  console.log('[login] ADMIN_EMAIL env:', process.env.ADMIN_EMAIL)
-  console.log('[login] hash env (20 premiers chars):', process.env.ADMIN_PASSWORD_HASH?.slice(0, 20))
-  console.log('[login] hash env longueur:', process.env.ADMIN_PASSWORD_HASH?.length)
-
   // Vérifie email
   if (email !== process.env.ADMIN_EMAIL) {
-    console.log('[login] email KO')
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
   }
 
   // Vérifie mot de passe
   const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH!)
-  console.log('[login] bcrypt.compare résultat:', valid)
   if (!valid) {
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
   }

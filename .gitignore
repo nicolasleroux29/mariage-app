@@ -40,4 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# photos & médias (gérés manuellement sur le serveur)
+/public/*.png
+/public/*.jpg
+/public/*.jpeg
+/public/*.webp
+
 /app/generated/prisma

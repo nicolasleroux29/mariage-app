@@ -8,13 +8,13 @@ export default function HomePage() {
       <PublicHeader />
       <main>
         <section className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center bg-gradient-to-b from-pink-50 to-white px-4 text-center">
-          <div className="w-36 h-36 rounded-full overflow-hidden mb-10 shadow-sm">
+          <div className="w-56 h-56 rounded-full overflow-hidden mb-10 shadow-sm">
             <Image
               src="/optimizedyannjudith.png"
               alt="Yann & Judith"
-              width={144}
-              height={144}
-              className="object-cover w-full h-full"
+              width={224}
+              height={224}
+              className="object-cover object-[center_40%] w-full h-full"
               priority
             />
           </div>

@@ -54,7 +54,7 @@ export default function PresentationPage() {
                   alt="Yann & Judith"
                   width={192}
                   height={192}
-                  className="object-cover w-full h-full"
+                  className="object-cover object-[center_40%] w-full h-full"
                 />
               </div>
               <div className="flex flex-col gap-4 text-sm text-gray-500 leading-relaxed">
