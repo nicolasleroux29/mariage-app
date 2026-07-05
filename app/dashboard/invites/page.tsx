@@ -155,8 +155,63 @@ export default function InvitesPage() {
         </div>
       </div>
 
-      {/* Tableau */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Vue mobile : cartes */}
+      <div className="md:hidden flex flex-col gap-3">
+        {loading ? (
+          <p className="p-6 text-gray-400">Chargement...</p>
+        ) : invites.length === 0 ? (
+          <p className="p-6 text-gray-400">Aucun invité pour le moment.</p>
+        ) : invites.map(invite => {
+          const statut = statutRsvp(invite)
+          return (
+            <div key={invite.id} className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-semibold text-gray-800">{invite.prenom} {invite.nom}</span>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${invite.rsvp ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                  {statut.label}
+                </span>
+              </div>
+              {invite.email && (
+                <p className="text-xs text-gray-400 mb-3">{invite.email}</p>
+              )}
+              {invite.rsvp ? (
+                <div className="grid grid-cols-2 gap-1 text-xs text-gray-600 mb-3">
+                  <span>Église : {invite.rsvp.eglise ? '✅' : '❌'}</span>
+                  <span>Vin d'honneur : {invite.rsvp.vinHonneur ? '✅' : '❌'}</span>
+                  <span>Repas : {invite.rsvp.repas ? '✅' : '❌'}</span>
+                  <span>Retour noce : {invite.rsvp.retourNoce ? '✅' : '❌'}</span>
+                  <span>Enfants : {invite.rsvp.enfants ? `✅ (${invite.rsvp.nbEnfants ?? '?'})` : '❌'}</span>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-300 mb-3 italic">Pas encore de réponse</p>
+              )}
+              <div className="flex gap-3 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => copierLien(invite.token)}
+                  className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
+                >
+                  {copiedToken === invite.token ? '✓ Copié !' : 'Copier le lien'}
+                </button>
+                <button
+                  onClick={() => openEdit(invite)}
+                  className="text-gray-400 hover:text-gray-600 transition text-xs font-medium"
+                >
+                  Modifier
+                </button>
+                <button
+                  onClick={() => handleDelete(invite)}
+                  className="text-red-400 hover:text-red-600 transition text-xs font-medium"
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Vue desktop : tableau */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
         {loading ? (
           <p className="p-6 text-gray-400">Chargement...</p>
         ) : invites.length === 0 ? (
