@@ -27,7 +27,7 @@ export default function PublicHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-pink-100">
+      <header className="sticky top-0 z-50 bg-[#faf9f7]/90 backdrop-blur border-b border-stone-100">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="text-pink-400 font-semibold text-lg tracking-widest">
             Y &amp; J
@@ -42,7 +42,7 @@ export default function PublicHeader() {
                 className={`transition ${
                   pathname === link.href
                     ? 'text-pink-400 font-medium'
-                    : 'text-gray-400 hover:text-pink-400'
+                    : 'text-stone-400 hover:text-pink-400'
                 }`}
               >
                 {link.label}
@@ -78,7 +78,7 @@ export default function PublicHeader() {
             )}
             <button
               onClick={() => setMenuOpen(v => !v)}
-              className="text-gray-400 hover:text-pink-400 transition p-1"
+              className="text-stone-400 hover:text-pink-400 transition p-1"
               aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               {menuOpen ? (
@@ -100,14 +100,14 @@ export default function PublicHeader() {
 
       {/* Overlay plein écran mobile */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-white flex flex-col items-center justify-center gap-10 md:hidden">
+        <div className="fixed inset-0 z-40 bg-[#faf9f7] flex flex-col items-center justify-center gap-10 md:hidden">
           {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
               className={`text-2xl font-light tracking-wide transition ${
-                pathname === link.href ? 'text-pink-400' : 'text-gray-500 hover:text-pink-400'
+                pathname === link.href ? 'text-pink-400' : 'text-stone-500 hover:text-pink-400'
               }`}
             >
               {link.label}

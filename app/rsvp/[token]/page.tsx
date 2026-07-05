@@ -11,10 +11,10 @@ export default async function RsvpPage({ params }: { params: Promise<{ token: st
 
   if (!invite) {
     return (
-      <main className="min-h-screen bg-pink-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 max-w-sm w-full text-center">
-          <h1 className="text-2xl font-semibold text-pink-400 mb-3">Lien invalide</h1>
-          <p className="text-gray-500 text-sm">
+      <main className="min-h-screen bg-[#faf9f7] flex items-center justify-center px-4">
+        <div className="bg-white rounded-xl border border-stone-100 p-8 max-w-sm w-full text-center">
+          <h1 className="text-2xl font-light text-stone-700 font-serif mb-3">Lien invalide</h1>
+          <p className="text-stone-500 text-sm">
             Ce lien de réponse est invalide ou a expiré.
             Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, contactez les mariés.
           </p>

@@ -1,5 +1,5 @@
 # Projet Site Web Mariage — Yann & Judith
-## Documentation technique — État au 26 juin 2026
+## Documentation technique — État au 5 juillet 2026
 
 ---
 
@@ -163,6 +163,14 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ### Dashboard
 - [x] Liens distribués via QR code imprimé — pas d'envoi par email depuis le dashboard
 - [x] Suppression / modification d'un invité
+- [x] Vue carte responsive sur mobile pour la liste des invités (dashboard)
+
+### Design (refonte premium en cours)
+- [x] Typographie : Playfair Display (serif) sur tous les titres h1/h2 des pages publiques
+- [x] Espacements : hero py-24/py-32, sections gap-24, paragraphes leading-loose, cards p-8
+- [x] Palette de couleurs : fond ivoire #faf9f7, sections/cards bg-stone-50, textes stone-700/600/400, accent pink-400 conservé
+- [x] Animations : composant FadeIn (IntersectionObserver) sur sections, stagger CSS sur hero accueil
+- [x] Boutons et bordures : rounded-xl sur cards, rounded-md sur boutons Oui/Non, inputs border-stone-200, RsvpForm aligné sur nouvelle palette
 
 ### Déploiement
 - [x] Configuration VPS OVH (VPS Starter Debian, PM2 + nginx)
