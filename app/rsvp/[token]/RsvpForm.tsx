@@ -33,17 +33,17 @@ function ToggleField({
   onChange: (v: boolean) => void
 }) {
   return (
-    <div className="bg-white rounded-xl border border-stone-100 p-6">
-      <p className="font-medium text-stone-700 mb-1">{label}</p>
-      <p className="text-sm text-stone-400 mb-4">{description}</p>
+    <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
+      <p className="font-medium text-[#E6C771] mb-1">{label}</p>
+      <p className="text-sm text-[#D98287]/60 mb-4">{description}</p>
       <div className="flex gap-3">
         <button
           type="button"
           onClick={() => onChange(true)}
           className={`flex-1 py-2.5 rounded-md text-sm font-medium tracking-wide transition ${
             value === true
-              ? 'bg-pink-400 text-white'
-              : 'border border-pink-200 text-stone-500 hover:border-pink-400'
+              ? 'bg-[#D98287] text-white'
+              : 'border border-[#D98287]/30 text-[#D98287]/80 hover:border-[#D98287]'
           }`}
         >
           Oui
@@ -53,8 +53,8 @@ function ToggleField({
           onClick={() => onChange(false)}
           className={`flex-1 py-2.5 rounded-md text-sm font-medium tracking-wide transition ${
             value === false
-              ? 'bg-stone-100 text-stone-600'
-              : 'border border-stone-200 text-stone-400 hover:border-stone-400'
+              ? 'bg-[#D98287]/10 text-[#D98287]'
+              : 'border border-[#D98287]/25 text-[#D98287]/60 hover:border-[#D98287]/50'
           }`}
         >
           Non
@@ -124,22 +124,22 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
   return (
     <>
       <PublicHeader />
-      <main className="min-h-screen bg-[#faf9f7] py-12 px-4">
+      <main className="min-h-screen bg-[#FDF5EA] py-12 px-4">
         <div className="max-w-lg mx-auto">
 
           <div className="text-center mb-10">
-            <p className="text-pink-400 text-xs uppercase tracking-widest mb-3">19 juin 2027</p>
-            <h1 className="text-3xl font-light text-stone-700 font-serif">
+            <p className="text-[#D98287] text-xs uppercase tracking-widest mb-3">19 juin 2027</p>
+            <h1 className="text-3xl font-light text-[#E6C771] font-serif">
               Yann &amp; Judith
             </h1>
-            <p className="text-stone-400 text-sm mt-2">Faire-part de réponse</p>
+            <p className="text-[#D98287]/60 text-sm mt-2">Faire-part de réponse</p>
           </div>
 
-          <div className="bg-white rounded-xl border border-stone-100 p-6 mb-6">
-            <p className="text-lg font-medium text-stone-700">
+          <div className="bg-white rounded-xl border border-[#D98287]/15 p-6 mb-6">
+            <p className="text-lg font-medium text-[#E6C771]">
               Bonjour {invite.prenom} {invite.nom}&nbsp;!
             </p>
-            <p className="text-sm text-stone-400 mt-1 leading-relaxed">
+            <p className="text-sm text-[#D98287]/60 mt-1 leading-relaxed">
               Merci de remplir ce formulaire pour nous indiquer votre présence.
               {hasExisting && ' Vous pouvez modifier vos réponses à tout moment via ce lien.'}
             </p>
@@ -169,7 +169,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
               onChange={setVinHonneur}
             />
             <ToggleField
-              label="Dîner de gala"
+              label="Dîner"
               description="Samedi 19 juin 2027 — 19h00"
               value={repas}
               onChange={setRepas}
@@ -181,17 +181,17 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
               onChange={setRetourNoce}
             />
 
-            <div className="bg-white rounded-xl border border-stone-100 p-6">
-              <p className="font-medium text-stone-700 mb-1">Enfants</p>
-              <p className="text-sm text-stone-400 mb-4">Viendrez-vous accompagné(e) d&apos;enfants ?</p>
+            <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
+              <p className="font-medium text-[#E6C771] mb-1">Enfants</p>
+              <p className="text-sm text-[#D98287]/60 mb-4">Viendrez-vous accompagné(e) d&apos;enfants ?</p>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setEnfants(true)}
                   className={`flex-1 py-2.5 rounded-md text-sm font-medium tracking-wide transition ${
                     enfants === true
-                      ? 'bg-pink-400 text-white'
-                      : 'border border-pink-200 text-stone-500 hover:border-pink-400'
+                      ? 'bg-[#D98287] text-white'
+                      : 'border border-[#D98287]/30 text-[#D98287]/80 hover:border-[#D98287]'
                   }`}
                 >
                   Oui
@@ -201,8 +201,8 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
                   onClick={() => { setEnfants(false); setNbEnfants('') }}
                   className={`flex-1 py-2.5 rounded-md text-sm font-medium tracking-wide transition ${
                     enfants === false
-                      ? 'bg-stone-100 text-stone-600'
-                      : 'border border-stone-200 text-stone-400 hover:border-stone-400'
+                      ? 'bg-[#D98287]/10 text-[#D98287]'
+                      : 'border border-[#D98287]/25 text-[#D98287]/60 hover:border-[#D98287]/50'
                   }`}
                 >
                   Non
@@ -210,40 +210,40 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
               </div>
               {enfants === true && (
                 <div className="mt-4">
-                  <label className="text-sm text-stone-500 mb-1 block">Nombre d&apos;enfants</label>
+                  <label className="text-sm text-[#D98287]/80 mb-1 block">Nombre d&apos;enfants</label>
                   <input
                     type="number"
                     min="1"
                     value={nbEnfants}
                     onChange={e => setNbEnfants(e.target.value)}
-                    className="border border-stone-200 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-pink-300 transition"
+                    className="border border-[#D98287]/25 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-[#D98287]/20 focus:border-[#D98287]/50 transition"
                     placeholder="ex : 2"
                   />
                 </div>
               )}
             </div>
 
-            <div className="bg-white rounded-xl border border-stone-100 p-6">
-              <p className="font-medium text-stone-700 mb-1">Votre adresse email</p>
-              <p className="text-sm text-stone-400 mb-4">Pour recevoir la confirmation de votre réponse</p>
+            <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
+              <p className="font-medium text-[#E6C771] mb-1">Votre adresse email</p>
+              <p className="text-sm text-[#D98287]/60 mb-4">Pour recevoir la confirmation de votre réponse</p>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="prenom.nom@email.com"
-                className="border border-stone-200 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-pink-300 transition"
+                className="border border-[#D98287]/25 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-[#D98287]/20 focus:border-[#D98287]/50 transition"
               />
             </div>
 
-            <div className="bg-white rounded-xl border border-stone-100 p-6">
-              <p className="font-medium text-stone-700 mb-1">Allergies ou régimes alimentaires</p>
-              <p className="text-sm text-stone-400 mb-4">Optionnel — à renseigner si nécessaire</p>
+            <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
+              <p className="font-medium text-[#E6C771] mb-1">Allergies ou régimes alimentaires</p>
+              <p className="text-sm text-[#D98287]/60 mb-4">Optionnel — à renseigner si nécessaire</p>
               <textarea
                 value={allergies}
                 onChange={e => setAllergies(e.target.value)}
                 rows={3}
                 placeholder="Gluten, lactose, végétarien..."
-                className="border border-stone-200 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-pink-300 transition resize-none"
+                className="border border-[#D98287]/25 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-[#D98287]/20 focus:border-[#D98287]/50 transition resize-none"
               />
             </div>
 
@@ -252,7 +252,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-pink-400 text-white rounded-lg py-4 font-medium tracking-wide hover:bg-pink-500 transition disabled:opacity-50 mt-2"
+              className="bg-[#D98287] text-white rounded-lg py-4 font-medium tracking-wide hover:bg-[#D98287] transition disabled:opacity-50 mt-2"
             >
               {submitting
                 ? 'Enregistrement...'
@@ -262,7 +262,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
             </button>
           </form>
 
-          <p className="text-center text-xs text-stone-300 mt-8">
+          <p className="text-center text-xs text-[#D98287]/40 mt-8">
             Ce lien est personnel — merci de ne pas le partager.
           </p>
         </div>

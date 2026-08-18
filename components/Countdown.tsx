@@ -18,10 +18,10 @@ function getTimeLeft() {
 function Unit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center min-w-[60px]">
-      <span className="text-4xl font-light text-pink-400 tabular-nums">
+      <span className="text-4xl font-light text-[#D98287] tabular-nums">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-xs text-stone-400 uppercase tracking-widest mt-1">{label}</span>
+      <span className="text-xs text-[#D98287]/60 uppercase tracking-widest mt-1">{label}</span>
     </div>
   )
 }
@@ -35,7 +35,7 @@ export default function Countdown() {
     return () => clearInterval(id)
   }, [])
 
-  if (!time) return <p className="text-stone-400 text-sm">C&apos;est le grand jour !</p>
+  if (!time) return <p className="text-[#D98287]/60 text-sm">C&apos;est le grand jour !</p>
   if (time === null) return null
 
   return (

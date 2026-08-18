@@ -27,9 +27,9 @@ export default function PublicHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[#faf9f7]/90 backdrop-blur border-b border-stone-100">
+      <header className="sticky top-0 z-50 bg-[#FDF5EA]/90 backdrop-blur border-b border-[#D98287]/15">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-pink-400 font-semibold text-lg tracking-widest">
+          <Link href="/" className="text-[#D98287] font-semibold text-lg tracking-widest">
             Y &amp; J
           </Link>
 
@@ -41,8 +41,8 @@ export default function PublicHeader() {
                 href={link.href}
                 className={`transition ${
                   pathname === link.href
-                    ? 'text-pink-400 font-medium'
-                    : 'text-stone-400 hover:text-pink-400'
+                    ? 'text-[#D98287] font-medium'
+                    : 'text-[#D98287]/60 hover:text-[#D98287]'
                 }`}
               >
                 {link.label}
@@ -53,8 +53,8 @@ export default function PublicHeader() {
                 href={`/rsvp/${rsvpToken}`}
                 className={`transition border rounded-full px-3 py-1 text-xs ${
                   pathname.startsWith('/rsvp')
-                    ? 'border-pink-400 text-pink-400 font-medium'
-                    : 'border-pink-200 text-pink-400 hover:border-pink-400'
+                    ? 'border-[#D98287] text-[#D98287] font-medium'
+                    : 'border-[#D98287]/30 text-[#D98287] hover:border-[#D98287]'
                 }`}
               >
                 Mon RSVP
@@ -69,8 +69,8 @@ export default function PublicHeader() {
                 href={`/rsvp/${rsvpToken}`}
                 className={`border rounded-full px-3 py-1 text-xs transition ${
                   pathname.startsWith('/rsvp')
-                    ? 'border-pink-400 text-pink-400 font-medium'
-                    : 'border-pink-200 text-pink-400 hover:border-pink-400'
+                    ? 'border-[#D98287] text-[#D98287] font-medium'
+                    : 'border-[#D98287]/30 text-[#D98287] hover:border-[#D98287]'
                 }`}
               >
                 Mon RSVP
@@ -78,7 +78,7 @@ export default function PublicHeader() {
             )}
             <button
               onClick={() => setMenuOpen(v => !v)}
-              className="text-stone-400 hover:text-pink-400 transition p-1"
+              className="text-[#D98287]/60 hover:text-[#D98287] transition p-1"
               aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               {menuOpen ? (
@@ -100,14 +100,14 @@ export default function PublicHeader() {
 
       {/* Overlay plein écran mobile */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#faf9f7] flex flex-col items-center justify-center gap-10 md:hidden">
+        <div className="fixed inset-0 z-40 bg-[#FDF5EA] flex flex-col items-center justify-center gap-10 md:hidden">
           {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
               className={`text-2xl font-light tracking-wide transition ${
-                pathname === link.href ? 'text-pink-400' : 'text-stone-500 hover:text-pink-400'
+                pathname === link.href ? 'text-[#D98287]' : 'text-[#D98287]/80 hover:text-[#D98287]'
               }`}
             >
               {link.label}

@@ -25,7 +25,7 @@ Cahier des charges complet : `cahier-des-charges-mariage.md`
 | Base de données | PostgreSQL 16 | Base relationnelle, tournant dans Docker en local |
 | Adaptateur DB | `@prisma/adapter-pg` | Requis par Prisma 7 pour la connexion PostgreSQL |
 | Auth | JWT (`jose`) + bcryptjs | Cookie de session httpOnly, pas de librairie externe |
-| Emails | À intégrer (Resend ou Brevo) | Confirmations RSVP et notifications mariés |
+| Emails | Resend | Confirmations RSVP (si email renseigné) + notification mariés à chaque RSVP |
 | Hébergement cible | OVH | VPS ou hébergement Node.js |
 
 ---
@@ -58,16 +58,29 @@ mariage-app/
 ├── app/
 │   ├── api/
 │   │   ├── auth/login/route.ts       # POST — authentification mariés
+│   │   ├── rsvp/route.ts             # POST — enregistrement RSVP
 │   │   └── invites/
 │   │       ├── route.ts              # GET liste / POST ajout invité
+│   │       ├── [id]/route.ts         # PATCH modification / DELETE suppression
 │   │       └── export/route.ts       # GET — export CSV
 │   ├── dashboard/
 │   │   ├── layout.tsx                # Navigation commune dashboard
 │   │   ├── page.tsx                  # Page synthèse (compteurs)
-│   │   ├── invites/page.tsx          # Liste invités + ajout + export
+│   │   ├── invites/page.tsx          # Liste invités + ajout + export (vue carte mobile)
 │   │   └── allergies/page.tsx        # Liste allergies pour traiteur
+│   ├── rsvp/[token]/
+│   │   ├── page.tsx                  # Page RSVP (server component)
+│   │   └── RsvpForm.tsx              # Formulaire RSVP (client component)
+│   ├── presentation/page.tsx         # Page présentation mariés + témoins
+│   ├── mariage/page.tsx              # Programme, lieux, contact
+│   ├── faq/page.tsx                  # Hébergements, transport, dress code
+│   ├── infos/page.tsx                # Redirect → /faq
 │   ├── login/page.tsx                # Page de connexion mariés
-│   └── layout.tsx                    # Layout racine Next.js
+│   └── layout.tsx                    # Layout racine Next.js (Playfair Display + Geist)
+├── components/
+│   ├── PublicHeader.tsx              # Navigation publique (sticky, menu mobile)
+│   ├── Countdown.tsx                 # Compte à rebours temps réel
+│   └── FadeIn.tsx                    # Animation fade-in au scroll (IntersectionObserver)
 ├── lib/
 │   └── prisma.ts                     # Client Prisma partagé (singleton)
 ├── prisma/
@@ -168,7 +181,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ### Design (refonte premium en cours)
 - [x] Typographie : Playfair Display (serif) sur tous les titres h1/h2 des pages publiques
 - [x] Espacements : hero py-24/py-32, sections gap-24, paragraphes leading-loose, cards p-8
-- [x] Palette de couleurs : fond ivoire #faf9f7, sections/cards bg-stone-50, textes stone-700/600/400, accent pink-400 conservé
+- [x] Palette de couleurs : fond #FDF5EA, titres #E6C771, textes/accents #D98287 (cards internes en blanc pour se détacher du fond)
 - [x] Animations : composant FadeIn (IntersectionObserver) sur sections, stagger CSS sur hero accueil
 - [x] Boutons et bordures : rounded-xl sur cards, rounded-md sur boutons Oui/Non, inputs border-stone-200, RsvpForm aligné sur nouvelle palette
 
@@ -178,8 +191,8 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Application déployée et accessible en HTTP
 - [x] Pages dashboard (synthèse + allergies) forcées en rendu dynamique (`force-dynamic`)
 - [x] Photos exclues du repo git (gérées manuellement via `scp` sur le VPS)
-- [ ] Uploader la photo des mariés sur le VPS : `scp public/optimizedyannjudith.png debian@IP_VPS:~/mariage-app/public/`
-- [ ] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts` (ajoutés temporairement pour diagnostiquer le hash bcrypt)
+- [x] Uploader la photo des mariés sur le VPS
+- [x] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
 - [ ] Mise en place HTTPS (voir checklist section 11)
 - [ ] Contenu à compléter par les mariés (témoins, hébergements, FAQ, texte de présentation)
 
@@ -242,7 +255,7 @@ Ces modifications sont **permanentes et compatibles HTTPS** — rien à revertir
 - [ ] Mettre à jour `RESEND_FROM` dans `.env`
 
 ### Code
-- [ ] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
+- [x] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
 
 ### Déploiement
 - [ ] `npm run build` sur le VPS
