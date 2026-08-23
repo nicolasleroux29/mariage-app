@@ -4,34 +4,29 @@ import FadeIn from '@/components/FadeIn'
 
 const temoins = [
   {
-    prenom: 'Prénom',
-    nom: 'Nom',
-    role: 'Témoin de Yann',
+    prenom: 'Mathieu',
+    role: 'Frère et témoin de Judith',
     bio: 'Quelques mots sur ce témoin à compléter.',
   },
   {
-    prenom: 'Prénom',
-    nom: 'Nom',
-    role: 'Témoin de Yann',
+    prenom: 'Erwan',
+    role: 'Frère et témoin de Yann',
     bio: 'Quelques mots sur ce témoin à compléter.',
   },
   {
-    prenom: 'Prénom',
-    nom: 'Nom',
-    role: 'Témoin de Judith',
+    prenom: 'Nicolas',
+    role: 'Ami et témoin de Yann',
     bio: 'Quelques mots sur ce témoin à compléter.',
   },
   {
-    prenom: 'Prénom',
-    nom: 'Nom',
-    role: 'Témoin de Judith',
-    bio: 'Quelques mots sur ce témoin à compléter.',
+    prenom: 'Aude',
+    role: 'Amie et demoiselle d\'honneur de Judith',
+    bio: 'Quelques mots sur cette demoiselle d\'honneur à compléter.',
   },
   {
-    prenom: 'Prénom',
-    nom: 'Nom',
-    role: 'Témoin',
-    bio: 'Quelques mots sur ce témoin à compléter.',
+    prenom: 'Camille',
+    role: 'Amie et demoiselle d\'honneur de Judith',
+    bio: 'Quelques mots sur cette demoiselle d\'honneur à compléter.',
   },
 ]
 
@@ -64,12 +59,14 @@ export default function PresentationPage() {
                 </div>
                 <div className="flex flex-col gap-5 text-base text-[#D98287] leading-loose">
                   <p>
-                    Aujourd&apos;hui, nous sommes heureux de franchir cette nouvelle étape et de
-                    célébrer notre union avec vous.
+                    Après sept années à partager nos vies et quatre ans d&apos;aventure bordelaise,
+                    nous voici à la prochaine étape de notre vie commune : le mariage. Depuis notre
+                    rencontre à Brest en février 2020, de nombreux voyages, moments de joie, de
+                    partage et d&apos;aventure sont venus nous combler de bonheur.
                   </p>
                   <p>
-                    Texte de présentation à compléter — votre histoire, ce qui vous unit, ce que
-                    vous souhaitez partager avec vos invités.
+                    Nous voici prêts à franchir cette nouvelle étape et à sceller notre union. Nous
+                    serons heureux et fiers de partager ce moment de bonheur à vos côtés.
                   </p>
                 </div>
               </div>
@@ -79,11 +76,11 @@ export default function PresentationPage() {
           {/* Nos témoins */}
           <FadeIn>
             <section>
-              <h2 className="text-xl font-medium text-[#E6C771] mb-8 font-serif">Nos témoins</h2>
+              <h2 className="text-xl font-medium text-[#E6C771] mb-8 font-serif">Présentation des témoins et DH :</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {temoins.map((temoin, i) => (
                   <div key={i} className="bg-white rounded-xl p-8 flex flex-col items-center text-center gap-5">
-                    <p className="font-medium text-[#E6C771]">{temoin.prenom} {temoin.nom}</p>
+                    <p className="font-medium text-[#E6C771]">{temoin.prenom}</p>
                     <div className="w-24 h-24 rounded-full bg-[#D98287]/20 flex items-center justify-center">
                       <span className="text-[#D98287] text-2xl font-light">
                         {temoin.prenom[0]}

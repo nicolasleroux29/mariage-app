@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { sendRsvpConfirmation, sendRsvpNotification } from '@/lib/emails'
 
 export async function POST(req: NextRequest) {
-  const { token, eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, allergies, email } = await req.json()
+  const { token, eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, nbAdultes, allergies, email } = await req.json()
 
   if (!token) {
     return NextResponse.json({ error: 'Token manquant' }, { status: 400 })
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   }
 
   const isUpdate = invite.rsvp !== null
-  const rsvpData = { eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, allergies }
+  const rsvpData = { eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, nbAdultes, allergies }
 
   const [rsvp] = await Promise.all([
     prisma.rsvp.upsert({

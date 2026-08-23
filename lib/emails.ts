@@ -10,6 +10,7 @@ type RsvpData = {
   retourNoce: boolean | null
   enfants: boolean | null
   nbEnfants: number | null
+  nbAdultes: number | null
   allergies: string | null
 }
 
@@ -48,6 +49,10 @@ function confirmationHtml(prenom: string, nom: string, token: string, rsvp: Rsvp
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.retourNoce)}</td>
     </tr>
     <tr style="background:#fdf2f8">
+      <td style="padding:10px 14px;color:#6b7280">Adultes</td>
+      <td style="padding:10px 14px;font-weight:500">${rsvp.nbAdultes ?? '—'}</td>
+    </tr>
+    <tr>
       <td style="padding:10px 14px;color:#6b7280">Enfants</td>
       <td style="padding:10px 14px;font-weight:500">
         ${oui(rsvp.enfants)}${rsvp.enfants && rsvp.nbEnfants ? ` (${rsvp.nbEnfants})` : ''}
@@ -104,6 +109,10 @@ function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate:
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.retourNoce)}</td>
     </tr>
     <tr style="background:#fdf2f8">
+      <td style="padding:10px 14px;color:#6b7280">Adultes</td>
+      <td style="padding:10px 14px;font-weight:500">${rsvp.nbAdultes ?? '—'}</td>
+    </tr>
+    <tr>
       <td style="padding:10px 14px;color:#6b7280">Enfants</td>
       <td style="padding:10px 14px;font-weight:500">
         ${oui(rsvp.enfants)}${rsvp.enfants && rsvp.nbEnfants ? ` (${rsvp.nbEnfants})` : ''}

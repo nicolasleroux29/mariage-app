@@ -10,7 +10,7 @@ export async function GET() {
   const header = [
     'Prénom', 'Nom', 'Email', 'Statut',
     'Église', 'Vin d\'honneur', 'Repas', 'Retour de noce',
-    'Enfants', 'Nb enfants', 'Allergies'
+    'Nb adultes', 'Enfants', 'Nb enfants', 'Allergies'
   ].join(';')
 
   const rows = invites.map((invite: (typeof invites)[number]) => [
@@ -22,6 +22,7 @@ export async function GET() {
     invite.rsvp?.vinHonneur ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.repas ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.retourNoce ? 'Oui' : invite.rsvp ? 'Non' : '',
+    invite.rsvp?.nbAdultes ?? '',
     invite.rsvp?.enfants ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.nbEnfants ?? '',
     invite.rsvp?.allergies ?? '',

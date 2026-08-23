@@ -2,30 +2,6 @@ import PublicHeader from '@/components/PublicHeader'
 import FadeIn from '@/components/FadeIn'
 import Accordion from '@/components/Accordion'
 
-const hebergements = [
-  {
-    nom: "Nom de l'hôtel 1",
-    distance: 'X km du lieu de réception',
-    adresse: 'Adresse à compléter',
-    telephone: '+33 X XX XX XX XX',
-    site: '#',
-  },
-  {
-    nom: "Nom de l'hôtel 2",
-    distance: 'X km du lieu de réception',
-    adresse: 'Adresse à compléter',
-    telephone: '+33 X XX XX XX XX',
-    site: '#',
-  },
-  {
-    nom: "Nom de l'hôtel 3",
-    distance: 'X km du lieu de réception',
-    adresse: 'Adresse à compléter',
-    telephone: '+33 X XX XX XX XX',
-    site: '#',
-  },
-]
-
 export default function FaqPage() {
   return (
     <>
@@ -43,42 +19,29 @@ export default function FaqPage() {
           {/* Hébergements */}
           <FadeIn>
             <Accordion question="Où dormir ?">
-              <p className="text-sm text-[#D98287]/60 mb-6">
-                Nous avons sélectionné quelques hôtels à proximité. Pensez à réserver rapidement.
+              <p className="text-base text-[#D98287] leading-loose">
+                Des lits sont disponibles au manoir, n&apos;hésitez pas à nous contacter si vous en
+                avez besoin. Sinon nous pourrons vous fournir des adresses d&apos;hôtels alentours.
+                Les tentes sont interdites sur le domaine.
               </p>
-              <div className="flex flex-col gap-4">
-                {hebergements.map((h, i) => (
-                  <div key={i} className="bg-white rounded-xl p-6">
-                    <h4 className="text-base font-medium text-[#E6C771]">{h.nom}</h4>
-                    <p className="text-xs text-[#D98287] mt-0.5">{h.distance}</p>
-                    <p className="text-base text-[#D98287] mt-2">{h.adresse}</p>
-                    <p className="text-base text-[#D98287]">{h.telephone}</p>
-                    <a
-                      href={h.site}
-                      className="inline-block mt-4 text-sm text-[#D98287] hover:text-[#D98287] transition font-medium"
-                    >
-                      Voir le site →
-                    </a>
-                  </div>
-                ))}
-              </div>
             </Accordion>
           </FadeIn>
 
           {/* Transport */}
           <FadeIn>
-            <Accordion question="Comment venir ?">
+            <Accordion question="Comment venir sur place ?">
               <div className="flex flex-col gap-4">
                 <div className="bg-white rounded-xl p-6">
                   <h4 className="text-base font-medium text-[#E6C771]">En voiture</h4>
                   <p className="text-base text-[#D98287] mt-2 leading-loose">
-                    Indications d&apos;accès à compléter. Parking disponible sur place.
+                    Le manoir dispose d&apos;un grand parking.
                   </p>
                 </div>
                 <div className="bg-white rounded-xl p-6">
-                  <h4 className="text-base font-medium text-[#E6C771]">Navette</h4>
+                  <h4 className="text-base font-medium text-[#E6C771]">En train</h4>
                   <p className="text-base text-[#D98287] mt-2 leading-loose">
-                    Informations sur les navettes éventuelles à compléter.
+                    Vous arriverez à la gare de Brest. Dans ce cas, veuillez nous contacter le plus
+                    tôt possible afin d&apos;organiser des navettes le plus efficacement possible.
                   </p>
                 </div>
               </div>
@@ -87,9 +50,10 @@ export default function FaqPage() {
 
           {/* Dress code */}
           <FadeIn>
-            <Accordion question="Quelle tenue porter ?">
+            <Accordion question="Un dress code ?">
               <p className="text-base text-[#D98287] leading-loose">
-                Tenue de soirée souhaitée. À compléter avec vos préférences (couleurs à éviter, style souhaité, etc.).
+                Non, venez avec votre personnalité. Cependant, nous encourageons les militaires à
+                venir en tenue pour la cérémonie s&apos;ils le souhaitent.
               </p>
             </Accordion>
           </FadeIn>
@@ -100,7 +64,9 @@ export default function FaqPage() {
               <p className="text-base text-[#D98287] mb-4 leading-loose">
                 N&apos;hésitez pas à contacter les mariés pour toute question.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+
+              <p className="text-xs text-[#D98287] uppercase tracking-widest mb-2">Les mariés</p>
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <a
                   href="tel:0610324060"
                   className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
@@ -114,6 +80,49 @@ export default function FaqPage() {
                 >
                   <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Judith</p>
                   <p className="text-base font-medium text-[#E6C771]">06.52.80.81.11</p>
+                </a>
+              </div>
+
+              <p className="text-xs text-[#D98287] uppercase tracking-widest mb-2">Les demoiselles d&apos;honneur</p>
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                <a
+                  href="tel:0610980940"
+                  className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
+                >
+                  <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Camille</p>
+                  <p className="text-base font-medium text-[#E6C771]">06.10.98.09.40</p>
+                </a>
+                <a
+                  href="tel:0644700871"
+                  className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
+                >
+                  <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Aude</p>
+                  <p className="text-base font-medium text-[#E6C771]">06.44.70.08.71</p>
+                </a>
+              </div>
+
+              <p className="text-xs text-[#D98287] uppercase tracking-widest mb-2">Les témoins</p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="tel:0622343966"
+                  className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
+                >
+                  <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Mathieu</p>
+                  <p className="text-base font-medium text-[#E6C771]">06.22.34.39.66</p>
+                </a>
+                <a
+                  href="tel:0644799562"
+                  className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
+                >
+                  <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Erwan</p>
+                  <p className="text-base font-medium text-[#E6C771]">06.44.79.95.62</p>
+                </a>
+                <a
+                  href="tel:0643626824"
+                  className="flex-1 text-center bg-white rounded-xl py-4 px-6 shadow-sm hover:shadow transition"
+                >
+                  <p className="text-xs text-[#D98287] uppercase tracking-widest mb-1">Nicolas</p>
+                  <p className="text-base font-medium text-[#E6C771]">06.43.62.68.24</p>
                 </a>
               </div>
             </Accordion>

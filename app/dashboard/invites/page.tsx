@@ -9,6 +9,7 @@ type Rsvp = {
   retourNoce: boolean | null
   enfants: boolean | null
   nbEnfants: number | null
+  nbAdultes: number | null
   allergies: string | null
 }
 
@@ -180,7 +181,8 @@ export default function InvitesPage() {
                   <span>Vin d'honneur : {invite.rsvp.vinHonneur ? '✅' : '❌'}</span>
                   <span>Repas : {invite.rsvp.repas ? '✅' : '❌'}</span>
                   <span>Retour noce : {invite.rsvp.retourNoce ? '✅' : '❌'}</span>
-                  <span>Enfants : {invite.rsvp.enfants ? `✅ (${invite.rsvp.nbEnfants ?? '?'})` : '❌'}</span>
+                  <span>Adultes : {invite.rsvp.nbAdultes ?? '—'}</span>
+                  <span>Enfants : {invite.rsvp.enfants ? (invite.rsvp.nbEnfants ?? 0) : 0}</span>
                 </div>
               ) : (
                 <p className="text-xs text-gray-300 mb-3 italic">Pas encore de réponse</p>
@@ -227,8 +229,8 @@ export default function InvitesPage() {
                 <th className="px-4 py-3 text-left">Vin</th>
                 <th className="px-4 py-3 text-left">Repas</th>
                 <th className="px-4 py-3 text-left">Retour</th>
+                <th className="px-4 py-3 text-left">Adultes</th>
                 <th className="px-4 py-3 text-left">Enfants</th>
-                <th className="px-4 py-3 text-left">Nb</th>
                 <th className="px-4 py-3 text-left">Lien</th>
                 <th className="px-4 py-3 text-left">Actions</th>
               </tr>
@@ -245,8 +247,8 @@ export default function InvitesPage() {
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.vinHonneur ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.repas ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.retourNoce ? '✅' : '❌') : '—'}</td>
-                    <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.enfants ? '✅' : '❌') : '—'}</td>
-                    <td className="px-4 py-3">{invite.rsvp?.enfants ? (invite.rsvp.nbEnfants ?? '?') : '—'}</td>
+                    <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.nbAdultes ?? '—') : '—'}</td>
+                    <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.enfants ? (invite.rsvp.nbEnfants ?? 0) : 0) : '—'}</td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => copierLien(invite.token)}

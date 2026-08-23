@@ -10,6 +10,7 @@ type Rsvp = {
   retourNoce: boolean | null
   enfants: boolean | null
   nbEnfants: number | null
+  nbAdultes: number | null
   allergies: string | null
 }
 
@@ -74,6 +75,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
   const [retourNoce, setRetourNoce] = useState<boolean | null>(existing?.retourNoce ?? null)
   const [enfants, setEnfants] = useState<boolean | null>(existing?.enfants ?? null)
   const [nbEnfants, setNbEnfants] = useState<string>(existing?.nbEnfants?.toString() ?? '')
+  const [nbAdultes, setNbAdultes] = useState<string>(existing?.nbAdultes?.toString() ?? '')
   const [allergies, setAllergies] = useState<string>(existing?.allergies ?? '')
   const [email, setEmail] = useState<string>(invite.email ?? '')
   const [submitting, setSubmitting] = useState(false)
@@ -107,6 +109,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         retourNoce,
         enfants,
         nbEnfants: enfants && nbEnfants ? parseInt(nbEnfants, 10) : null,
+        nbAdultes: nbAdultes ? parseInt(nbAdultes, 10) : null,
         allergies: allergies.trim() || null,
         email: email.trim() || null,
       }),
@@ -156,30 +159,18 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <ToggleField
-              label="Cérémonie religieuse"
-              description="Samedi 19 juin 2027 — 14h30"
-              value={eglise}
-              onChange={setEglise}
-            />
-            <ToggleField
-              label="Vin d'honneur"
-              description="Samedi 19 juin 2027 — 17h30"
-              value={vinHonneur}
-              onChange={setVinHonneur}
-            />
-            <ToggleField
-              label="Dîner"
-              description="Samedi 19 juin 2027 — 19h00"
-              value={repas}
-              onChange={setRepas}
-            />
-            <ToggleField
-              label="Retour de noce"
-              description="Dimanche 20 juin 2027 — matin"
-              value={retourNoce}
-              onChange={setRetourNoce}
-            />
+            <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
+              <p className="font-medium text-[#E6C771] mb-1">Nombre d&apos;adultes</p>
+              <p className="text-sm text-[#D98287]/60 mb-4">Combien serez-vous d&apos;adultes (vous compris) ?</p>
+              <input
+                type="number"
+                min="1"
+                value={nbAdultes}
+                onChange={e => setNbAdultes(e.target.value)}
+                className="border border-[#D98287]/25 rounded-lg px-4 py-2.5 w-full focus:outline-none focus:ring-2 focus:ring-[#D98287]/20 focus:border-[#D98287]/50 transition"
+                placeholder="ex : 2"
+              />
+            </div>
 
             <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
               <p className="font-medium text-[#E6C771] mb-1">Enfants</p>
@@ -223,9 +214,34 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
               )}
             </div>
 
+            <ToggleField
+              label="Cérémonie religieuse"
+              description="Samedi 19 juin 2027 — 14h30"
+              value={eglise}
+              onChange={setEglise}
+            />
+            <ToggleField
+              label="Vin d'honneur"
+              description="Samedi 19 juin 2027 — 17h30"
+              value={vinHonneur}
+              onChange={setVinHonneur}
+            />
+            <ToggleField
+              label="Dîner"
+              description="Samedi 19 juin 2027 — 19h00"
+              value={repas}
+              onChange={setRepas}
+            />
+            <ToggleField
+              label="Retour de noce"
+              description="Dimanche 20 juin 2027 — matin"
+              value={retourNoce}
+              onChange={setRetourNoce}
+            />
+
             <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
               <p className="font-medium text-[#E6C771] mb-1">Votre adresse email</p>
-              <p className="text-sm text-[#D98287]/60 mb-4">Pour recevoir la confirmation de votre réponse</p>
+              <p className="text-sm text-[#D98287]/60 mb-4">Optionnel — pour recevoir la confirmation de votre réponse</p>
               <input
                 type="email"
                 value={email}

@@ -7,16 +7,25 @@ export default async function DashboardPage() {
   const totalReponses = await prisma.rsvp.count()
   const sansReponse = totalInvites - totalReponses
 
-  const stats = await prisma.rsvp.aggregate({
-    _sum: { nbEnfants: true },
-    where: { enfants: true }
+  const rsvps = await prisma.rsvp.findMany({
+    select: { eglise: true, vinHonneur: true, repas: true, retourNoce: true, enfants: true, nbAdultes: true, nbEnfants: true }
   })
 
+  // Chaque RSVP représente un foyer : quand il répond "oui" à un événement,
+  // on compte tout le foyer (adultes + enfants) présent à cet événement.
+  function headcount(rsvp: (typeof rsvps)[number]) {
+    return (rsvp.nbAdultes ?? 1) + (rsvp.enfants && rsvp.nbEnfants ? rsvp.nbEnfants : 0)
+  }
 
-  const countEglise = await prisma.rsvp.count({ where: { eglise: true } })
-  const countVin = await prisma.rsvp.count({ where: { vinHonneur: true } })
-  const countRepas = await prisma.rsvp.count({ where: { repas: true } })
-  const countRetour = await prisma.rsvp.count({ where: { retourNoce: true } })
+  const sumWhere = (pred: (r: (typeof rsvps)[number]) => boolean) =>
+    rsvps.filter(pred).reduce((total, r) => total + headcount(r), 0)
+
+  const countEglise = sumWhere(r => r.eglise === true)
+  const countVin = sumWhere(r => r.vinHonneur === true)
+  const countRepas = sumWhere(r => r.repas === true)
+  const countRetour = sumWhere(r => r.retourNoce === true)
+  const totalAdultes = rsvps.reduce((total, r) => total + (r.nbAdultes ?? 0), 0)
+  const totalEnfants = rsvps.reduce((total, r) => total + (r.enfants && r.nbEnfants ? r.nbEnfants : 0), 0)
 
   const cards = [
     { label: 'Invités total', value: totalInvites },
@@ -26,7 +35,8 @@ export default async function DashboardPage() {
     { label: 'Présents — Vin d\'honneur', value: countVin },
     { label: 'Présents — Repas', value: countRepas },
     { label: 'Présents — Retour de noce', value: countRetour },
-    { label: 'Enfants', value: stats._sum.nbEnfants ?? 0 },
+    { label: 'Adultes', value: totalAdultes },
+    { label: 'Enfants', value: totalEnfants },
   ]
 
   return (
