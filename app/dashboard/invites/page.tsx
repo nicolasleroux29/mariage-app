@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import QRCode from 'qrcode'
 
 type Rsvp = {
   eglise: boolean | null
@@ -36,6 +37,8 @@ export default function InvitesPage() {
   const [editPrenom, setEditPrenom] = useState('')
   const [editEmail, setEditEmail] = useState('')
   const [editSubmitting, setEditSubmitting] = useState(false)
+  const [qrInvite, setQrInvite] = useState<Invite | null>(null)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
 
   async function fetchInvites() {
     const res = await fetch('/api/invites')
@@ -89,6 +92,25 @@ export default function InvitesPage() {
     return `${window.location.origin}/invite/${token}`
   }
 
+  useEffect(() => {
+    if (!qrInvite) return
+    let cancelled = false
+    QRCode.toDataURL(getLien(qrInvite.token), { width: 1000, margin: 2 })
+      .then(url => { if (!cancelled) setQrDataUrl(url) })
+      .catch(() => { if (!cancelled) setQrDataUrl(null) })
+    return () => { cancelled = true }
+  }, [qrInvite])
+
+  function openQr(invite: Invite) {
+    setQrDataUrl(null)
+    setQrInvite(invite)
+  }
+
+  function closeQr() {
+    setQrInvite(null)
+    setQrDataUrl(null)
+  }
+
   async function copierLien(token: string) {
     const lien = getLien(token)
     if (navigator.clipboard?.writeText) {
@@ -105,6 +127,14 @@ export default function InvitesPage() {
     }
     setCopiedToken(token)
     setTimeout(() => setCopiedToken(null), 2000)
+  }
+
+  function telechargerQr() {
+    if (!qrDataUrl || !qrInvite) return
+    const a = document.createElement('a')
+    a.href = qrDataUrl
+    a.download = `qr-${qrInvite.prenom}-${qrInvite.nom}.png`
+    a.click()
   }
 
   function statutRsvp(invite: Invite) {
@@ -195,6 +225,12 @@ export default function InvitesPage() {
                   {copiedToken === invite.token ? '✓ Copié !' : 'Copier le lien'}
                 </button>
                 <button
+                  onClick={() => openQr(invite)}
+                  className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
+                >
+                  QR code
+                </button>
+                <button
                   onClick={() => openEdit(invite)}
                   className="text-gray-400 hover:text-gray-600 transition text-xs font-medium"
                 >
@@ -250,12 +286,20 @@ export default function InvitesPage() {
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.nbAdultes ?? '—') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.enfants ? (invite.rsvp.nbEnfants ?? 0) : 0) : '—'}</td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => copierLien(invite.token)}
-                        className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
-                      >
-                        {copiedToken === invite.token ? '✓ Copié !' : 'Copier le lien'}
-                      </button>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => copierLien(invite.token)}
+                          className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
+                        >
+                          {copiedToken === invite.token ? '✓ Copié !' : 'Copier le lien'}
+                        </button>
+                        <button
+                          onClick={() => openQr(invite)}
+                          className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
+                        >
+                          QR code
+                        </button>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-3">
@@ -322,6 +366,44 @@ export default function InvitesPage() {
                 className="flex-1 bg-pink-400 text-white rounded-lg py-2 text-sm font-medium hover:bg-pink-500 transition disabled:opacity-50"
               >
                 {editSubmitting ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modale QR code */}
+      {qrInvite && (
+        <div
+          className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4"
+          onClick={e => { if (e.target === e.currentTarget) closeQr() }}
+        >
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-xs text-center">
+            <h2 className="text-lg font-medium text-gray-700 mb-1">
+              {qrInvite.prenom} {qrInvite.nom}
+            </h2>
+            <p className="text-xs text-gray-400 mb-5">Lien RSVP à imprimer sur le carton</p>
+            <div className="flex items-center justify-center min-h-[220px]">
+              {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={qrDataUrl} alt={`QR code RSVP de ${qrInvite.prenom} ${qrInvite.nom}`} className="w-full max-w-[220px]" />
+              ) : (
+                <p className="text-gray-400 text-sm">Génération...</p>
+              )}
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => closeQr()}
+                className="flex-1 border border-gray-200 text-gray-500 rounded-lg py-2 text-sm hover:bg-gray-50 transition"
+              >
+                Fermer
+              </button>
+              <button
+                onClick={telechargerQr}
+                disabled={!qrDataUrl}
+                className="flex-1 bg-pink-400 text-white rounded-lg py-2 text-sm font-medium hover:bg-pink-500 transition disabled:opacity-50"
+              >
+                Télécharger
               </button>
             </div>
           </div>
