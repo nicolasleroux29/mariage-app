@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { SignJWT } from 'jose'
 import { isRateLimited, recordFailedAttempt, clearAttempts } from '@/lib/rateLimit'
+import { log, truncate } from '@/lib/log'
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 
@@ -16,6 +17,7 @@ export async function POST(req: NextRequest) {
 
   const { limited, retryAfterSeconds } = isRateLimited(ip)
   if (limited) {
+    await log('RATE_LIMITED', `Connexion bloquée (trop de tentatives) — IP ${ip}`, { success: false, ip })
     return NextResponse.json(
       { error: 'Trop de tentatives, réessayez plus tard' },
       { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
@@ -27,6 +29,7 @@ export async function POST(req: NextRequest) {
   // Vérifie email
   if (email !== process.env.ADMIN_EMAIL) {
     recordFailedAttempt(ip)
+    await log('LOGIN', `Échec de connexion (email inconnu) : ${truncate(email)}`, { success: false, ip })
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
   }
 
@@ -34,10 +37,12 @@ export async function POST(req: NextRequest) {
   const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH!)
   if (!valid) {
     recordFailedAttempt(ip)
+    await log('LOGIN', `Échec de connexion (mot de passe invalide) : ${truncate(email)}`, { success: false, ip })
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
   }
 
   clearAttempts(ip)
+  await log('LOGIN', `Connexion réussie : ${truncate(email)}`, { success: true, ip })
 
   // Génère le JWT
   const token = await new SignJWT({ role: 'admin' })

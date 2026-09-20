@@ -14,6 +14,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard/allergies" className="text-gray-600 hover:text-pink-400 transition">
           Allergies
         </Link>
+        <Link href="/dashboard/logs" className="text-gray-600 hover:text-pink-400 transition">
+          Journal
+        </Link>
       </nav>
       <main className="p-6">
         {children}

@@ -37,3 +37,25 @@ model Rsvp {
   submittedAt DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+enum LogType {
+  LOGIN
+  RATE_LIMITED
+  INVITE_CREATED
+  INVITE_UPDATED
+  INVITE_DELETED
+  RSVP_SUBMITTED
+  RSVP_UPDATED
+}
+
+model LogEntry {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  type      LogType
+  success   Boolean  @default(true)
+  message   String
+  ip        String?
+  meta      Json?
+
+  @@index([createdAt])
+}

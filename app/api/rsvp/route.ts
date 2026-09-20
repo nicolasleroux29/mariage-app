@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendRsvpConfirmation, sendRsvpNotification } from '@/lib/emails'
+import { log } from '@/lib/log'
 
 export async function POST(req: NextRequest) {
   const { token, eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, nbAdultes, allergies, email } = await req.json()
@@ -29,6 +30,12 @@ export async function POST(req: NextRequest) {
     }),
     email ? prisma.invite.update({ where: { id: invite.id }, data: { email } }) : Promise.resolve(),
   ])
+
+  await log(
+    isUpdate ? 'RSVP_UPDATED' : 'RSVP_SUBMITTED',
+    `${isUpdate ? 'RSVP modifié' : 'RSVP soumis'} : ${invite.prenom} ${invite.nom}`,
+    { meta: { inviteId: invite.id } }
+  )
 
   const confirmationEmail = email ?? invite.email
 
