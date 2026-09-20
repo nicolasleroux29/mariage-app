@@ -18,6 +18,15 @@ function oui(v: boolean | null) {
   return v ? 'Oui' : v === false ? 'Non' : '—'
 }
 
+function escapeHtml(s: string) {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function confirmationHtml(prenom: string, nom: string, token: string, rsvp: RsvpData) {
   const rsvpUrl = `${BASE_URL}/rsvp/${token}`
   return `
@@ -61,7 +70,7 @@ function confirmationHtml(prenom: string, nom: string, token: string, rsvp: Rsvp
     ${rsvp.allergies ? `
     <tr>
       <td style="padding:10px 14px;color:#6b7280">Allergies</td>
-      <td style="padding:10px 14px;font-weight:500">${rsvp.allergies}</td>
+      <td style="padding:10px 14px;font-weight:500">${escapeHtml(rsvp.allergies)}</td>
     </tr>` : ''}
   </table>
 
@@ -121,7 +130,7 @@ function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate:
     ${rsvp.allergies ? `
     <tr>
       <td style="padding:10px 14px;color:#6b7280">Allergies</td>
-      <td style="padding:10px 14px;font-weight:500">${rsvp.allergies}</td>
+      <td style="padding:10px 14px;font-weight:500">${escapeHtml(rsvp.allergies)}</td>
     </tr>` : ''}
   </table>
 
