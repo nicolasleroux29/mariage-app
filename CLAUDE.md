@@ -193,7 +193,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Photos exclues du repo git (gérées manuellement via `scp` sur le VPS)
 - [x] Uploader la photo des mariés sur le VPS
 - [x] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
-- [ ] Mise en place HTTPS (voir checklist section 11)
+- [x] Mise en place HTTPS (voir section 10) — fait le 20/09/2026
 - [ ] Contenu à compléter par les mariés (témoins, hébergements, FAQ, texte de présentation)
 
 ---
@@ -206,9 +206,9 @@ ADMIN_EMAIL="..."
 ADMIN_PASSWORD_HASH=\$2b\$10\$...   # bcrypt — échapper TOUS les $ avec \$ (pas de guillemets)
 JWT_SECRET="..."                     # 32 bytes hex : node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 RESEND_API_KEY="re_..."
-RESEND_FROM="Yann & Judith <onboarding@resend.dev>"   # → changer avec le vrai domaine en prod HTTPS
-NEXT_PUBLIC_BASE_URL="http://IP_VPS:3000"             # → changer en https://domaine.fr lors du passage HTTPS
-HTTPS="false"                                          # → passer à "true" lors du passage HTTPS
+RESEND_FROM="Yann & Judith <onboarding@resend.dev>"   # à changer une fois le domaine vérifié dans Resend
+NEXT_PUBLIC_BASE_URL="https://mariage-judith-yann.fr" # valeur en prod depuis le 20/09/2026 (dev local : http://localhost:3000)
+HTTPS="true"                                           # valeur en prod depuis le 20/09/2026
 ```
 
 **Génération du hash bcrypt :**
@@ -220,54 +220,26 @@ node -e "require('bcryptjs').hash('MonMotDePasse', 10).then(h => console.log(h))
 
 ---
 
-## 10. État HTTP actuel (temporaire)
+## 10. HTTPS — passé en production le 20/09/2026
 
-Le site tourne en HTTP sur le VPS en attendant l'achat du domaine et la mise en place de HTTPS.
-Deux adaptations ont été faites spécifiquement pour fonctionner sans HTTPS :
+Le site tourne désormais en HTTPS sur `https://mariage-judith-yann.fr` (certificat Let's Encrypt, renouvellement automatique via le timer systemd `certbot.timer`, expiration 19/12/2026). Nginx écoute sur 80 (redirection 301 vers 443) et 443, et proxifie vers `localhost:3000` où tourne l'app Next.js (process pm2 nommé `mariage`, pas `mariage-app`).
 
-| Fichier | Modification | Comportement HTTPS |
+Deux adaptations avaient été faites pour fonctionner sans HTTPS pendant la phase HTTP, désormais actives :
+
+| Fichier | Modification | Comportement |
 |---|---|---|
-| `app/api/auth/login/route.ts` | `secure: process.env.HTTPS === 'true'` | Le cookie session sera `secure` quand `HTTPS=true` dans `.env` |
-| `app/dashboard/invites/page.tsx` | Fallback `execCommand` si `clipboard.writeText` indisponible | `clipboard.writeText` sera utilisé automatiquement en HTTPS |
+| `app/api/auth/login/route.ts` | `secure: process.env.HTTPS === 'true'` | Cookie session `secure` (actif, `HTTPS=true` en prod) |
+| `app/dashboard/invites/page.tsx` | Fallback `execCommand` si `clipboard.writeText` indisponible | `clipboard.writeText` utilisé nativement en HTTPS |
 
-Ces modifications sont **permanentes et compatibles HTTPS** — rien à revertir, il suffira d'activer `HTTPS=true`.
+La config nginx (`/etc/nginx/sites-available/mariage` sur le VPS, pas versionnée dans ce repo) transmet aussi `X-Real-IP` et `X-Forwarded-For` — nécessaire pour que le rate-limiting et le journal d'activité (`/dashboard/logs`) identifient correctement l'IP des visiteurs.
 
----
-
-## 11. Checklist passage en HTTPS
-
-À faire quand le domaine est acheté et les DNS configurés :
-
-### DNS & Certificat
-- [ ] Acheter le nom de domaine
-- [ ] Pointer le domaine vers l'IP du VPS (enregistrement A)
-- [ ] Installer certbot : `sudo apt install certbot python3-certbot-nginx`
-- [ ] Générer le certificat : `sudo certbot --nginx -d domaine.fr`
-- [ ] Vérifier le renouvellement automatique : `sudo certbot renew --dry-run`
-
-### Variables d'environnement (sur le VPS, dans `.env`)
-- [ ] `NEXT_PUBLIC_BASE_URL` → `https://domaine.fr`
-- [ ] `HTTPS` → `true`
-- [ ] `RESEND_FROM` → `Yann & Judith <contact@domaine.fr>` (après vérification domaine dans Resend)
-
-### Resend
-- [ ] Ajouter et vérifier le domaine dans le dashboard Resend
-- [ ] Mettre à jour `RESEND_FROM` dans `.env`
-
-### Code
-- [x] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
-
-### Déploiement
-- [ ] `npm run build` sur le VPS
-- [ ] `pm2 restart mariage-app`
-- [ ] Tester la connexion dashboard (cookie secure)
-- [ ] Tester un RSVP (email de confirmation avec lien https)
-- [ ] Tester la copie de lien (clipboard API)
-- [ ] Vérifier que HTTP redirige vers HTTPS (nginx)
+**Reste à faire :**
+- [ ] Ajouter et vérifier le domaine dans le dashboard Resend, puis mettre à jour `RESEND_FROM` (actuellement toujours `onboarding@resend.dev`)
+- [ ] Supprimer (ou configurer correctement) l'enregistrement AAAA du domaine chez OVH — il pointe vers une IPv6 qui n'appartient pas au VPS (qui n'a pas d'IPv6 configurée), risque de connexions IPv6 en échec pour certains visiteurs
 
 ---
 
-## 12. Commandes utiles
+## 11. Commandes utiles
 
 ```bash
 # Dev local (WSL2)
@@ -277,12 +249,17 @@ npx prisma studio          # Interface visuelle de la base (localhost:5555)
 npx prisma migrate dev     # Appliquer une nouvelle migration
 npx prisma generate        # Régénérer le client après modif schéma
 
-# VPS (production)
+# VPS (production) — pm2/node installés via nvm, à sourcer si la commande n'est pas trouvée :
+# export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh"
 npm run build              # Build (inclut prisma generate)
-pm2 restart mariage-app    # Redémarrer l'application
-pm2 logs mariage-app       # Voir les logs en temps réel
-git pull && npm run build && pm2 restart mariage-app   # Déployer une mise à jour
+pm2 restart mariage --update-env   # Redémarrer l'application (le process pm2 s'appelle "mariage")
+pm2 logs mariage           # Voir les logs en temps réel
+git pull && npm run build && pm2 restart mariage --update-env   # Déployer une mise à jour
 git checkout -- . && git pull                          # Annuler les changements locaux et puller
+
+# HTTPS / nginx (VPS)
+sudo certbot renew --dry-run                    # Vérifier le renouvellement auto du certificat
+sudo nginx -t && sudo systemctl reload nginx    # Après modif de /etc/nginx/sites-available/mariage
 
 # Upload de la photo des mariés sur le VPS
 scp public/optimizedyannjudith.png debian@IP_VPS:~/mariage-app/public/
