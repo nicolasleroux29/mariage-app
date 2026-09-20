@@ -1,11 +1,19 @@
 import type { NextConfig } from "next";
 
+// En dev, le bundler Next.js utilise eval() pour le hot-reload — CSP doit
+// autoriser 'unsafe-eval' dans ce cas. Le build de production n'en a pas besoin.
+// 'unsafe-inline' sur script-src est nécessaire dans les deux cas : l'App Router
+// injecte des <script> inline (streaming RSC) sur chaque page, et un CSP par
+// nonce imposerait un rendu dynamique sur toutes les pages (voir doc Next.js
+// content-security-policy.md, incompatible avec nos pages publiques statiques).
+const isDev = process.env.NODE_ENV !== "production";
+
 const securityHeaders = [
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
       "font-src 'self'",
