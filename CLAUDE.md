@@ -25,7 +25,7 @@ Cahier des charges complet : `cahier-des-charges-mariage.md`
 | Base de données | PostgreSQL 16 | Base relationnelle, tournant dans Docker en local |
 | Adaptateur DB | `@prisma/adapter-pg` | Requis par Prisma 7 pour la connexion PostgreSQL |
 | Auth | JWT (`jose`) + bcryptjs | Cookie de session httpOnly, pas de librairie externe |
-| Emails | Resend | Confirmations RSVP (si email renseigné) + notification mariés à chaque RSVP |
+| Emails | Brevo | Confirmations RSVP (si email renseigné) + notification mariés à chaque RSVP |
 | Hébergement cible | OVH | VPS ou hébergement Node.js |
 
 ---
@@ -169,7 +169,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Contact mariés intégré dans la page "Le Mariage" (pas de page dédiée)
 
 ### Emails
-- [x] Intégration Resend
+- [x] Intégration emails (Brevo, migré depuis Resend le 02/10/2026 — FR/EU, domaine vérifié)
 - [x] Email de confirmation automatique à l'invité après RSVP (si email renseigné)
 - [x] Notification email aux mariés à chaque nouveau RSVP / modification
 
@@ -193,7 +193,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 - [x] Photos exclues du repo git (gérées manuellement via `scp` sur le VPS)
 - [x] Uploader la photo des mariés sur le VPS
 - [x] Supprimer les `console.log` de debug dans `app/api/auth/login/route.ts`
-- [x] Mise en place HTTPS (voir section 10) — fait le 20/09/2026
+- [x] Mise en place HTTPS (voir section 11) — fait le 20/09/2026
 - [ ] Contenu à compléter par les mariés (témoins, hébergements, FAQ, texte de présentation)
 
 ---
@@ -205,8 +205,9 @@ DATABASE_URL="postgresql://mariage:mariage_dev@localhost:5432/mariage"
 ADMIN_EMAIL="..."
 ADMIN_PASSWORD_HASH=\$2b\$10\$...   # bcrypt — échapper TOUS les $ avec \$ (pas de guillemets)
 JWT_SECRET="..."                     # 32 bytes hex : node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-RESEND_API_KEY="re_..."
-RESEND_FROM="Yann & Judith <onboarding@resend.dev>"   # à changer une fois le domaine vérifié dans Resend
+BREVO_API_KEY="xkeysib-..."
+BREVO_SENDER_NAME="Yann & Judith"
+BREVO_SENDER_EMAIL="administrateur@mariage-judith-yann.fr"
 NEXT_PUBLIC_BASE_URL="https://mariage-judith-yann.fr" # valeur en prod depuis le 20/09/2026 (dev local : http://localhost:3000)
 HTTPS="true"                                           # valeur en prod depuis le 20/09/2026
 ```
@@ -220,7 +221,18 @@ node -e "require('bcryptjs').hash('MonMotDePasse', 10).then(h => console.log(h))
 
 ---
 
-## 10. HTTPS — passé en production le 20/09/2026
+## 10. Emails — migré de Resend vers Brevo le 02/10/2026
+
+Resend remplacé par Brevo (`@getbrevo/brevo`) pour garder les données des invités (adresses email) sur un hébergeur français/UE plutôt qu'un transfert vers les US — voir le point RGPD plus bas. Domaine `mariage-judith-yann.fr` vérifié dans Brevo, expéditeur `administrateur@mariage-judith-yann.fr`.
+
+- `lib/brevo.ts` — client `BrevoClient` (clé `BREVO_API_KEY`)
+- `lib/emails.ts` — `brevo.transactionalEmails.sendTransacEmail({ sender, to, subject, htmlContent })` remplace l'ancien `resend.emails.send(...)`
+
+**Piège Brevo à connaître :** le compte a une sécurité "IP autorisées" (Paramètres → Sécurité → IP autorisées sur app.brevo.com) qui bloque silencieusement (401) tout appel API venant d'une IP non whitelistée. Il faut y ajouter l'IP du VPS (`152.228.137.159`) avant le déploiement en prod, en plus de toute IP de dev utilisée pour tester localement — sinon les emails échouent en silence (l'envoi est fire-and-forget côté `app/api/rsvp/route.ts`, les erreurs sont avalées).
+
+---
+
+## 11. HTTPS — passé en production le 20/09/2026
 
 Le site tourne désormais en HTTPS sur `https://mariage-judith-yann.fr` (certificat Let's Encrypt, renouvellement automatique via le timer systemd `certbot.timer`, expiration 19/12/2026). Nginx écoute sur 80 (redirection 301 vers 443) et 443, et proxifie vers `localhost:3000` où tourne l'app Next.js (process pm2 nommé `mariage`, pas `mariage-app`).
 
@@ -233,13 +245,11 @@ Deux adaptations avaient été faites pour fonctionner sans HTTPS pendant la pha
 
 La config nginx (`/etc/nginx/sites-available/mariage` sur le VPS, pas versionnée dans ce repo) transmet aussi `X-Real-IP` et `X-Forwarded-For` — nécessaire pour que le rate-limiting et le journal d'activité (`/dashboard/logs`) identifient correctement l'IP des visiteurs.
 
-**Reste à faire :**
-- [ ] Ajouter et vérifier le domaine dans le dashboard Resend, puis mettre à jour `RESEND_FROM` (actuellement toujours `onboarding@resend.dev`)
-- [ ] Supprimer (ou configurer correctement) l'enregistrement AAAA du domaine chez OVH — il pointe vers une IPv6 qui n'appartient pas au VPS (qui n'a pas d'IPv6 configurée), risque de connexions IPv6 en échec pour certains visiteurs
+**IPv6 — abandonné, site en IPv4 uniquement (02/10/2026) :** le VPS n'a jamais eu d'IPv6 globale malgré l'allocation visible côté OVH — `ip -6 addr show` ne montre qu'une adresse link-local (`fe80::...`), `netplan apply` n'a rien changé. La config réseau (`dhcp6: true`, `accept-ra: true` dans `/etc/netplan/50-cloud-init.yaml`) est correcte mais OVH ne fournit pas d'IPv6 au niveau réseau pour cette VM. Activer l'IPv6 nécessiterait un reboot du VPS et/ou un ticket support OVH — jugé pas rentable pour ce site. L'enregistrement AAAA a été supprimé chez OVH ; le site reste en IPv4 uniquement, ce qui fonctionne pour tout le monde (pas de ralentissement happy-eyeballs). Si l'IPv6 est activée un jour côté OVH, il faudra aussi ajouter `listen [::]:80;` et `listen [::]:443 ssl;` dans `/etc/nginx/sites-available/mariage` (actuellement IPv4 uniquement — seul le bloc `default` écoute en IPv6, sur le port 80 seulement).
 
 ---
 
-## 11. Commandes utiles
+## 12. Commandes utiles
 
 ```bash
 # Dev local (WSL2)

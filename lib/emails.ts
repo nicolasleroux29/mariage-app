@@ -1,6 +1,9 @@
-import { resend } from './resend'
+import { brevo } from './brevo'
 
-const FROM = process.env.RESEND_FROM!
+const SENDER = {
+  name: process.env.BREVO_SENDER_NAME!,
+  email: process.env.BREVO_SENDER_EMAIL!,
+}
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
 
 type RsvpData = {
@@ -147,11 +150,11 @@ export async function sendRsvpConfirmation(
   invite: { prenom: string; nom: string; email: string; token: string },
   rsvp: RsvpData
 ) {
-  await resend.emails.send({
-    from: FROM,
-    to: invite.email,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: SENDER,
+    to: [{ email: invite.email, name: `${invite.prenom} ${invite.nom}` }],
     subject: 'Yann & Judith — Confirmation de votre réponse',
-    html: confirmationHtml(invite.prenom, invite.nom, invite.token, rsvp),
+    htmlContent: confirmationHtml(invite.prenom, invite.nom, invite.token, rsvp),
   })
 }
 
@@ -160,10 +163,10 @@ export async function sendRsvpNotification(
   rsvp: RsvpData,
   isUpdate: boolean
 ) {
-  await resend.emails.send({
-    from: FROM,
-    to: process.env.ADMIN_EMAIL!,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: SENDER,
+    to: [{ email: process.env.ADMIN_EMAIL! }],
     subject: `${isUpdate ? 'RSVP modifié' : 'Nouveau RSVP'} — ${invite.prenom} ${invite.nom}`,
-    html: notificationHtml(invite.prenom, invite.nom, rsvp, isUpdate),
+    htmlContent: notificationHtml(invite.prenom, invite.nom, rsvp, isUpdate),
   })
 }
