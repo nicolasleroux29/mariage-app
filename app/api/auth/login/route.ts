@@ -6,6 +6,16 @@ import { log, truncate } from '@/lib/log'
 
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
 
+// Comptes autorisés sur le dashboard : les mariés + l'admin technique, chacun son mot de passe
+const ACCOUNTS = [
+  { email: process.env.ADMIN_EMAIL, hash: process.env.ADMIN_PASSWORD_HASH },
+  { email: process.env.TECH_ADMIN_EMAIL, hash: process.env.TECH_ADMIN_PASSWORD_HASH },
+].filter((a): a is { email: string; hash: string } => !!a.email && !!a.hash)
+
+// Hash factice comparé quand l'email est inconnu, pour que le temps de réponse
+// ne révèle pas si un email correspond à un compte
+const DUMMY_HASH = bcrypt.hashSync('dummy-password', 10)
+
 function getClientIp(req: NextRequest): string {
   const forwardedFor = req.headers.get('x-forwarded-for')
   if (forwardedFor) return forwardedFor.split(',')[0].trim()
@@ -26,15 +36,17 @@ export async function POST(req: NextRequest) {
 
   const { email, password } = await req.json()
 
-  // Vérifie email
-  if (email !== process.env.ADMIN_EMAIL) {
+  const account = ACCOUNTS.find((a) => a.email.toLowerCase() === String(email).trim().toLowerCase())
+
+  // bcrypt.compare tourne toujours, même si l'email est inconnu (temps constant)
+  const valid = await bcrypt.compare(String(password), account?.hash ?? DUMMY_HASH)
+
+  if (!account) {
     recordFailedAttempt(ip)
     await log('LOGIN', `Échec de connexion (email inconnu) : ${truncate(email)}`, { success: false, ip })
     return NextResponse.json({ error: 'Identifiants invalides' }, { status: 401 })
   }
 
-  // Vérifie mot de passe
-  const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH!)
   if (!valid) {
     recordFailedAttempt(ip)
     await log('LOGIN', `Échec de connexion (mot de passe invalide) : ${truncate(email)}`, { success: false, ip })

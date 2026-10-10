@@ -165,7 +165,7 @@ export async function sendRsvpNotification(
 ) {
   await brevo.transactionalEmails.sendTransacEmail({
     sender: SENDER,
-    to: [{ email: process.env.ADMIN_EMAIL! }],
+    to: process.env.NOTIFICATION_EMAIL!.split(',').map((email) => ({ email: email.trim() })),
     subject: `${isUpdate ? 'RSVP modifié' : 'Nouveau RSVP'} — ${invite.prenom} ${invite.nom}`,
     htmlContent: notificationHtml(invite.prenom, invite.nom, rsvp, isUpdate),
   })

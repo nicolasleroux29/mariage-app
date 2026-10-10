@@ -130,7 +130,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ## 6. Authentification
 
 - **Route :** `POST /api/auth/login`
-- **Credentials :** stockés dans `.env` (`ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`)
+- **Comptes :** deux comptes dans `.env`, chacun son mot de passe — mariés (`ADMIN_EMAIL` = judithetyann@mariage-judith-yann.fr, `ADMIN_PASSWORD_HASH`) et admin technique (`TECH_ADMIN_EMAIL` = Nicolas, `TECH_ADMIN_PASSWORD_HASH`). Email comparé sans tenir compte de la casse ; bcrypt tourne toujours (hash factice si email inconnu) pour ne pas révéler par le temps de réponse quels emails existent
 - **Session :** cookie `session` httpOnly, JWT signé HS256, expiration 24h
 - **Protection :** middleware Next.js sur toutes les routes `/dashboard/*`
 - **Génération du hash :** `node -e "require('bcryptjs').hash('MonMotDePasse', 10).then(h => console.log(h))"`
@@ -171,7 +171,7 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 ### Emails
 - [x] Intégration emails (Brevo, migré depuis Resend le 02/10/2026 — FR/EU, domaine vérifié)
 - [x] Email de confirmation automatique à l'invité après RSVP (si email renseigné)
-- [x] Notification email aux mariés à chaque nouveau RSVP / modification
+- [x] Notification email aux mariés à chaque nouveau RSVP / modification (destinataires : `NOTIFICATION_EMAIL`, séparés par des virgules — indépendant des comptes de connexion)
 
 ### Dashboard
 - [x] Liens distribués via QR code imprimé — pas d'envoi par email depuis le dashboard
@@ -202,8 +202,11 @@ Le token UUID dans `Invite` est le lien nominatif — généré automatiquement 
 
 ```env
 DATABASE_URL="postgresql://mariage:mariage_dev@localhost:5432/mariage"
-ADMIN_EMAIL="..."
+ADMIN_EMAIL="judithetyann@mariage-judith-yann.fr"   # compte des mariés
 ADMIN_PASSWORD_HASH=\$2b\$10\$...   # bcrypt — échapper TOUS les $ avec \$ (pas de guillemets)
+TECH_ADMIN_EMAIL="..."               # admin technique (Nicolas), accès dashboard
+TECH_ADMIN_PASSWORD_HASH=\$2b\$10\$...  # même règle d'échappement
+NOTIFICATION_EMAIL="judithetyann@mariage-judith-yann.fr"  # destinataire(s) des notifs RSVP, séparés par des virgules
 JWT_SECRET="..."                     # 32 bytes hex : node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 BREVO_API_KEY="xkeysib-..."
 BREVO_SENDER_NAME="Yann & Judith"
