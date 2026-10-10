@@ -24,6 +24,54 @@ type Invite = {
   rsvp: Rsvp | null
 }
 
+type RsvpForm = {
+  eglise: boolean | null
+  vinHonneur: boolean | null
+  repas: boolean | null
+  retourNoce: boolean | null
+  enfants: boolean | null
+  nbEnfants: string
+  nbAdultes: string
+  allergies: string
+}
+
+const EMPTY_RSVP_FORM: RsvpForm = {
+  eglise: null, vinHonneur: null, repas: null, retourNoce: null,
+  enfants: null, nbEnfants: '', nbAdultes: '', allergies: '',
+}
+
+const RSVP_TOGGLES: { key: 'eglise' | 'vinHonneur' | 'repas' | 'retourNoce' | 'enfants'; label: string }[] = [
+  { key: 'eglise', label: 'Église' },
+  { key: 'vinHonneur', label: "Vin d'honneur" },
+  { key: 'repas', label: 'Repas' },
+  { key: 'retourNoce', label: 'Retour de noce' },
+  { key: 'enfants', label: 'Enfants' },
+]
+
+function TriState({ value, onChange }: { value: boolean | null; onChange: (v: boolean | null) => void }) {
+  const options: { v: boolean | null; label: string }[] = [
+    { v: true, label: 'Oui' },
+    { v: false, label: 'Non' },
+    { v: null, label: '—' },
+  ]
+  return (
+    <div className="flex gap-1">
+      {options.map(o => (
+        <button
+          key={o.label}
+          type="button"
+          onClick={() => onChange(o.v)}
+          className={`px-3 py-1 rounded-md text-xs font-medium transition ${
+            value === o.v ? 'bg-pink-400 text-white' : 'border border-gray-200 text-gray-500 hover:bg-gray-50'
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function InvitesPage() {
   const [invites, setInvites] = useState<Invite[]>([])
   const [loading, setLoading] = useState(true)
@@ -36,7 +84,9 @@ export default function InvitesPage() {
   const [editNom, setEditNom] = useState('')
   const [editPrenom, setEditPrenom] = useState('')
   const [editEmail, setEditEmail] = useState('')
+  const [editRsvp, setEditRsvp] = useState<RsvpForm | null>(null)
   const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
   const [qrInvite, setQrInvite] = useState<Invite | null>(null)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
 
@@ -67,18 +117,47 @@ export default function InvitesPage() {
     setEditNom(invite.nom)
     setEditPrenom(invite.prenom)
     setEditEmail(invite.email ?? '')
+    setEditError(null)
+    const r = invite.rsvp
+    setEditRsvp(r ? {
+      eglise: r.eglise, vinHonneur: r.vinHonneur, repas: r.repas, retourNoce: r.retourNoce,
+      enfants: r.enfants,
+      nbEnfants: r.nbEnfants?.toString() ?? '',
+      nbAdultes: r.nbAdultes?.toString() ?? '',
+      allergies: r.allergies ?? '',
+    } : null)
+  }
+
+  function setRsvpField<K extends keyof RsvpForm>(key: K, value: RsvpForm[K]) {
+    setEditRsvp(prev => prev ? { ...prev, [key]: value } : prev)
   }
 
   async function handleEdit() {
     if (!editInvite || !editNom || !editPrenom) return
     setEditSubmitting(true)
-    await fetch(`/api/invites/${editInvite.id}`, {
+    setEditError(null)
+    const rsvp = editRsvp ? {
+      eglise: editRsvp.eglise,
+      vinHonneur: editRsvp.vinHonneur,
+      repas: editRsvp.repas,
+      retourNoce: editRsvp.retourNoce,
+      enfants: editRsvp.enfants,
+      nbEnfants: editRsvp.enfants && editRsvp.nbEnfants ? parseInt(editRsvp.nbEnfants, 10) : null,
+      nbAdultes: editRsvp.nbAdultes ? parseInt(editRsvp.nbAdultes, 10) : null,
+      allergies: editRsvp.allergies.trim() || null,
+    } : undefined
+    const res = await fetch(`/api/invites/${editInvite.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom: editNom, prenom: editPrenom, email: editEmail || null }),
+      body: JSON.stringify({ nom: editNom, prenom: editPrenom, email: editEmail || null, rsvp }),
     })
-    setEditInvite(null)
     setEditSubmitting(false)
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      setEditError(data?.error ?? 'Erreur lors de l\'enregistrement')
+      return
+    }
+    setEditInvite(null)
     fetchInvites()
   }
 
@@ -331,7 +410,7 @@ export default function InvitesPage() {
           className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4"
           onClick={e => { if (e.target === e.currentTarget) setEditInvite(null) }}
         >
-          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-medium text-gray-700 mb-5">Modifier l&apos;invité</h2>
             <div className="flex flex-col gap-3">
               <input
@@ -353,6 +432,64 @@ export default function InvitesPage() {
                 className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
               />
             </div>
+
+            <h3 className="text-sm font-medium text-gray-700 mt-6 mb-3">Réponse RSVP</h3>
+            {editRsvp ? (
+              <div className="flex flex-col gap-3">
+                {RSVP_TOGGLES.map(({ key, label }) => (
+                  <div key={key} className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-gray-600">{label}</span>
+                    <TriState value={editRsvp[key]} onChange={v => setRsvpField(key, v)} />
+                  </div>
+                ))}
+                <div className="flex items-center justify-between gap-3">
+                  <label htmlFor="edit-nbAdultes" className="text-sm text-gray-600">Nombre d&apos;adultes</label>
+                  <input
+                    id="edit-nbAdultes"
+                    type="number"
+                    min="0"
+                    max="50"
+                    value={editRsvp.nbAdultes}
+                    onChange={e => setRsvpField('nbAdultes', e.target.value)}
+                    className="w-20 border rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                  />
+                </div>
+                {editRsvp.enfants && (
+                  <div className="flex items-center justify-between gap-3">
+                    <label htmlFor="edit-nbEnfants" className="text-sm text-gray-600">Nombre d&apos;enfants</label>
+                    <input
+                      id="edit-nbEnfants"
+                      type="number"
+                      min="0"
+                      max="50"
+                      value={editRsvp.nbEnfants}
+                      onChange={e => setRsvpField('nbEnfants', e.target.value)}
+                      className="w-20 border rounded-lg px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                    />
+                  </div>
+                )}
+                <textarea
+                  placeholder="Allergies / régime alimentaire"
+                  value={editRsvp.allergies}
+                  onChange={e => setRsvpField('allergies', e.target.value)}
+                  rows={2}
+                  className="border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                />
+              </div>
+            ) : (
+              <div className="text-sm text-gray-400">
+                <p className="italic mb-2">Pas encore de réponse.</p>
+                <button
+                  type="button"
+                  onClick={() => setEditRsvp(EMPTY_RSVP_FORM)}
+                  className="text-pink-400 hover:text-pink-600 transition text-xs font-medium"
+                >
+                  + Saisir une réponse (ex. reçue par téléphone)
+                </button>
+              </div>
+            )}
+
+            {editError && <p className="text-sm text-red-500 mt-4">{editError}</p>}
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => setEditInvite(null)}
