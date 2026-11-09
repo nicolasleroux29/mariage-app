@@ -17,6 +17,8 @@ model Invite {
   prenom    String
   email     String?
   token     String   @unique @default(uuid())
+  // Les mariés choisissent qui est invité au retour de noce (true par défaut : tous les invités existants y ont accès)
+  retourNoceAutorise Boolean @default(true)
   createdAt DateTime @default(now())
 
   rsvp Rsvp?

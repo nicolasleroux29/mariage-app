@@ -103,6 +103,7 @@ model Invite {
   prenom    String
   email     String?
   token     String    @unique @default(uuid())  // lien nominatif
+  retourNoceAutorise Boolean @default(true)    // invité au retour de noce (choisi par les mariés)
   createdAt DateTime  @default(now())
   rsvp      Rsvp?
 }

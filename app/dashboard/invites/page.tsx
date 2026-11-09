@@ -20,6 +20,7 @@ type Invite = {
   prenom: string
   email: string | null
   token: string
+  retourNoceAutorise: boolean
   createdAt: string
   rsvp: Rsvp | null
 }
@@ -78,12 +79,14 @@ export default function InvitesPage() {
   const [nom, setNom] = useState('')
   const [prenom, setPrenom] = useState('')
   const [email, setEmail] = useState('')
+  const [retourNoceAutorise, setRetourNoceAutorise] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [copiedToken, setCopiedToken] = useState<string | null>(null)
   const [editInvite, setEditInvite] = useState<Invite | null>(null)
   const [editNom, setEditNom] = useState('')
   const [editPrenom, setEditPrenom] = useState('')
   const [editEmail, setEditEmail] = useState('')
+  const [editRetourNoceAutorise, setEditRetourNoceAutorise] = useState(true)
   const [editRsvp, setEditRsvp] = useState<RsvpForm | null>(null)
   const [editSubmitting, setEditSubmitting] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
@@ -105,9 +108,9 @@ export default function InvitesPage() {
     await fetch('/api/invites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom, prenom, email })
+      body: JSON.stringify({ nom, prenom, email, retourNoceAutorise })
     })
-    setNom(''); setPrenom(''); setEmail('')
+    setNom(''); setPrenom(''); setEmail(''); setRetourNoceAutorise(true)
     setSubmitting(false)
     fetchInvites()
   }
@@ -117,6 +120,7 @@ export default function InvitesPage() {
     setEditNom(invite.nom)
     setEditPrenom(invite.prenom)
     setEditEmail(invite.email ?? '')
+    setEditRetourNoceAutorise(invite.retourNoceAutorise)
     setEditError(null)
     const r = invite.rsvp
     setEditRsvp(r ? {
@@ -140,7 +144,7 @@ export default function InvitesPage() {
       eglise: editRsvp.eglise,
       vinHonneur: editRsvp.vinHonneur,
       repas: editRsvp.repas,
-      retourNoce: editRsvp.retourNoce,
+      retourNoce: editRetourNoceAutorise ? editRsvp.retourNoce : null,
       enfants: editRsvp.enfants,
       nbEnfants: editRsvp.enfants && editRsvp.nbEnfants ? parseInt(editRsvp.nbEnfants, 10) : null,
       nbAdultes: editRsvp.nbAdultes ? parseInt(editRsvp.nbAdultes, 10) : null,
@@ -149,7 +153,10 @@ export default function InvitesPage() {
     const res = await fetch(`/api/invites/${editInvite.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nom: editNom, prenom: editPrenom, email: editEmail || null, rsvp }),
+      body: JSON.stringify({
+        nom: editNom, prenom: editPrenom, email: editEmail || null,
+        retourNoceAutorise: editRetourNoceAutorise, rsvp,
+      }),
     })
     setEditSubmitting(false)
     if (!res.ok) {
@@ -255,6 +262,15 @@ export default function InvitesPage() {
             onChange={e => setEmail(e.target.value)}
             className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
           />
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={retourNoceAutorise}
+              onChange={e => setRetourNoceAutorise(e.target.checked)}
+              className="accent-pink-400"
+            />
+            Invité au retour de noce
+          </label>
           <button
             onClick={handleAjout}
             disabled={submitting || !nom || !prenom}
@@ -289,7 +305,7 @@ export default function InvitesPage() {
                   <span>Église : {invite.rsvp.eglise ? '✅' : '❌'}</span>
                   <span>Vin d'honneur : {invite.rsvp.vinHonneur ? '✅' : '❌'}</span>
                   <span>Repas : {invite.rsvp.repas ? '✅' : '❌'}</span>
-                  <span>Retour noce : {invite.rsvp.retourNoce ? '✅' : '❌'}</span>
+                  <span>Retour noce : {invite.retourNoceAutorise ? (invite.rsvp.retourNoce ? '✅' : '❌') : <span className="text-gray-400">non invité</span>}</span>
                   <span>Adultes : {invite.rsvp.nbAdultes ?? '—'}</span>
                   <span>Enfants : {invite.rsvp.enfants ? (invite.rsvp.nbEnfants ?? 0) : 0}</span>
                 </div>
@@ -361,7 +377,11 @@ export default function InvitesPage() {
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.eglise ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.vinHonneur ? '✅' : '❌') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.repas ? '✅' : '❌') : '—'}</td>
-                    <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.retourNoce ? '✅' : '❌') : '—'}</td>
+                    <td className="px-4 py-3">
+                      {!invite.retourNoceAutorise
+                        ? <span className="text-xs text-gray-400">Non invité</span>
+                        : invite.rsvp ? (invite.rsvp.retourNoce ? '✅' : '❌') : '—'}
+                    </td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.nbAdultes ?? '—') : '—'}</td>
                     <td className="px-4 py-3">{invite.rsvp ? (invite.rsvp.enfants ? (invite.rsvp.nbEnfants ?? 0) : 0) : '—'}</td>
                     <td className="px-4 py-3">
@@ -431,12 +451,24 @@ export default function InvitesPage() {
                 onChange={e => setEditEmail(e.target.value)}
                 className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
               />
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={editRetourNoceAutorise}
+                  onChange={e => setEditRetourNoceAutorise(e.target.checked)}
+                  className="accent-pink-400"
+                />
+                Invité au retour de noce
+              </label>
+              {editInvite.retourNoceAutorise && !editRetourNoceAutorise && editInvite.rsvp?.retourNoce != null && (
+                <p className="text-xs text-gray-400">Sa réponse actuelle au retour de noce sera effacée.</p>
+              )}
             </div>
 
             <h3 className="text-sm font-medium text-gray-700 mt-6 mb-3">Réponse RSVP</h3>
             {editRsvp ? (
               <div className="flex flex-col gap-3">
-                {RSVP_TOGGLES.map(({ key, label }) => (
+                {RSVP_TOGGLES.filter(({ key }) => key !== 'retourNoce' || editRetourNoceAutorise).map(({ key, label }) => (
                   <div key={key} className="flex items-center justify-between gap-3">
                     <span className="text-sm text-gray-600">{label}</span>
                     <TriState value={editRsvp[key]} onChange={v => setRsvpField(key, v)} />

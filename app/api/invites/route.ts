@@ -11,14 +11,17 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { nom, prenom, email } = await req.json()
+  const { nom, prenom, email, retourNoceAutorise } = await req.json()
 
   if (!nom || !prenom) {
     return NextResponse.json({ error: 'Nom et prénom obligatoires' }, { status: 400 })
   }
+  if (retourNoceAutorise !== undefined && typeof retourNoceAutorise !== 'boolean') {
+    return NextResponse.json({ error: 'Accès retour de noce invalide' }, { status: 400 })
+  }
 
   const invite = await prisma.invite.create({
-    data: { nom, prenom, email }
+    data: { nom, prenom, email, retourNoceAutorise }
   })
 
   await log('INVITE_CREATED', `Invité ajouté : ${prenom} ${nom}`, { meta: { inviteId: invite.id } })

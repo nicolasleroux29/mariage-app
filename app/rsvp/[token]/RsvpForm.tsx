@@ -19,6 +19,7 @@ type Invite = {
   prenom: string
   email: string | null
   token: string
+  retourNoceAutorise: boolean
   rsvp: Rsvp | null
 }
 
@@ -106,7 +107,7 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
         eglise,
         vinHonneur,
         repas,
-        retourNoce,
+        retourNoce: invite.retourNoceAutorise ? retourNoce : null,
         enfants,
         nbEnfants: enfants && nbEnfants ? parseInt(nbEnfants, 10) : null,
         nbAdultes: nbAdultes ? parseInt(nbAdultes, 10) : null,
@@ -232,12 +233,14 @@ export default function RsvpForm({ invite }: { invite: Invite }) {
               value={repas}
               onChange={setRepas}
             />
-            <ToggleField
-              label="Retour de noce"
-              description="Dimanche 20 juin 2027 — matin"
-              value={retourNoce}
-              onChange={setRetourNoce}
-            />
+            {invite.retourNoceAutorise && (
+              <ToggleField
+                label="Retour de noce"
+                description="Dimanche 20 juin 2027 — matin"
+                value={retourNoce}
+                onChange={setRetourNoce}
+              />
+            )}
 
             <div className="bg-white rounded-xl border border-[#D98287]/15 p-6">
               <p className="font-medium text-[#E6C771] mb-1">Votre adresse email</p>

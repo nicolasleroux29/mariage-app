@@ -20,7 +20,11 @@ export async function POST(req: NextRequest) {
   }
 
   const isUpdate = invite.rsvp !== null
-  const rsvpData = { eglise, vinHonneur, repas, retourNoce, enfants, nbEnfants, nbAdultes, allergies }
+  // Le champ est masqué dans le formulaire, mais on l'ignore aussi côté serveur si l'invité n'y a pas accès
+  const rsvpData = {
+    eglise, vinHonneur, repas, enfants, nbEnfants, nbAdultes, allergies,
+    retourNoce: invite.retourNoceAutorise ? retourNoce : null,
+  }
 
   const [rsvp] = await Promise.all([
     prisma.rsvp.upsert({
@@ -45,7 +49,7 @@ export async function POST(req: NextRequest) {
   ]
   if (confirmationEmail) {
     emailPromises.push(sendRsvpConfirmation(
-      { prenom: invite.prenom, nom: invite.nom, email: confirmationEmail, token: invite.token },
+      { prenom: invite.prenom, nom: invite.nom, email: confirmationEmail, token: invite.token, retourNoceAutorise: invite.retourNoceAutorise },
       rsvpData
     ))
   }

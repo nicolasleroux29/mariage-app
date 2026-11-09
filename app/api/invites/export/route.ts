@@ -21,7 +21,7 @@ export async function GET() {
     invite.rsvp?.eglise ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.vinHonneur ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.repas ? 'Oui' : invite.rsvp ? 'Non' : '',
-    invite.rsvp?.retourNoce ? 'Oui' : invite.rsvp ? 'Non' : '',
+    !invite.retourNoceAutorise ? 'Non invité' : invite.rsvp?.retourNoce ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.nbAdultes ?? '',
     invite.rsvp?.enfants ? 'Oui' : invite.rsvp ? 'Non' : '',
     invite.rsvp?.nbEnfants ?? '',

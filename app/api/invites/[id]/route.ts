@@ -29,10 +29,13 @@ function isCountOrNull(v: unknown): v is number | null {
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const inviteId = parseInt(id, 10)
-  const { nom, prenom, email, rsvp } = await req.json()
+  const { nom, prenom, email, retourNoceAutorise, rsvp } = await req.json()
 
   if (!nom || !prenom) {
     return NextResponse.json({ error: 'Nom et prénom obligatoires' }, { status: 400 })
+  }
+  if (typeof retourNoceAutorise !== 'boolean') {
+    return NextResponse.json({ error: 'Accès retour de noce invalide' }, { status: 400 })
   }
 
   // Réponse RSVP optionnelle : saisie ou corrigée par les mariés depuis le dashboard
@@ -47,7 +50,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: 'Réponse RSVP invalide' }, { status: 400 })
     }
     rsvpData = {
-      eglise, vinHonneur, repas, retourNoce, enfants,
+      eglise, vinHonneur, repas, enfants,
+      retourNoce: retourNoceAutorise ? retourNoce : null,
       nbEnfants: enfants ? nbEnfants : null,
       nbAdultes,
       allergies: allergies?.trim().slice(0, 1000) || null,
@@ -59,7 +63,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const invite = await prisma.$transaction(async (tx) => {
     const updated = await tx.invite.update({
       where: { id: inviteId },
-      data: { nom, prenom, email: email || null },
+      data: { nom, prenom, email: email || null, retourNoceAutorise },
     })
     if (rsvpData) {
       await tx.rsvp.upsert({
@@ -67,6 +71,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         create: { inviteId, ...rsvpData },
         update: rsvpData,
       })
+    } else if (!retourNoceAutorise) {
+      // Accès retiré : une éventuelle réponse au retour de noce ne doit plus compter
+      await tx.rsvp.updateMany({ where: { inviteId }, data: { retourNoce: null } })
     }
     return updated
   })

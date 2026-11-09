@@ -30,7 +30,7 @@ function escapeHtml(s: string) {
     .replace(/'/g, '&#39;')
 }
 
-function confirmationHtml(prenom: string, nom: string, token: string, rsvp: RsvpData) {
+function confirmationHtml(prenom: string, nom: string, token: string, rsvp: RsvpData, retourNoceAutorise: boolean) {
   const rsvpUrl = `${BASE_URL}/rsvp/${token}`
   return `
 <!DOCTYPE html>
@@ -56,10 +56,11 @@ function confirmationHtml(prenom: string, nom: string, token: string, rsvp: Rsvp
       <td style="padding:10px 14px;color:#6b7280">Dîner de gala</td>
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.repas)}</td>
     </tr>
+    ${retourNoceAutorise ? `
     <tr>
       <td style="padding:10px 14px;color:#6b7280">Retour de noce</td>
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.retourNoce)}</td>
-    </tr>
+    </tr>` : ''}
     <tr style="background:#fdf2f8">
       <td style="padding:10px 14px;color:#6b7280">Adultes</td>
       <td style="padding:10px 14px;font-weight:500">${rsvp.nbAdultes ?? '—'}</td>
@@ -89,7 +90,7 @@ function confirmationHtml(prenom: string, nom: string, token: string, rsvp: Rsvp
 </html>`
 }
 
-function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate: boolean) {
+function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate: boolean, retourNoceAutorise: boolean) {
   const dashboardUrl = `${BASE_URL}/dashboard`
   return `
 <!DOCTYPE html>
@@ -116,10 +117,11 @@ function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate:
       <td style="padding:10px 14px;color:#6b7280">Dîner de gala</td>
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.repas)}</td>
     </tr>
+    ${retourNoceAutorise ? `
     <tr>
       <td style="padding:10px 14px;color:#6b7280">Retour de noce</td>
       <td style="padding:10px 14px;font-weight:500">${oui(rsvp.retourNoce)}</td>
-    </tr>
+    </tr>` : ''}
     <tr style="background:#fdf2f8">
       <td style="padding:10px 14px;color:#6b7280">Adultes</td>
       <td style="padding:10px 14px;font-weight:500">${rsvp.nbAdultes ?? '—'}</td>
@@ -147,19 +149,19 @@ function notificationHtml(prenom: string, nom: string, rsvp: RsvpData, isUpdate:
 }
 
 export async function sendRsvpConfirmation(
-  invite: { prenom: string; nom: string; email: string; token: string },
+  invite: { prenom: string; nom: string; email: string; token: string; retourNoceAutorise: boolean },
   rsvp: RsvpData
 ) {
   await brevo.transactionalEmails.sendTransacEmail({
     sender: SENDER,
     to: [{ email: invite.email, name: `${invite.prenom} ${invite.nom}` }],
     subject: 'Yann & Judith — Confirmation de votre réponse',
-    htmlContent: confirmationHtml(invite.prenom, invite.nom, invite.token, rsvp),
+    htmlContent: confirmationHtml(invite.prenom, invite.nom, invite.token, rsvp, invite.retourNoceAutorise),
   })
 }
 
 export async function sendRsvpNotification(
-  invite: { prenom: string; nom: string },
+  invite: { prenom: string; nom: string; retourNoceAutorise: boolean },
   rsvp: RsvpData,
   isUpdate: boolean
 ) {
@@ -167,6 +169,6 @@ export async function sendRsvpNotification(
     sender: SENDER,
     to: process.env.NOTIFICATION_EMAIL!.split(',').map((email) => ({ email: email.trim() })),
     subject: `${isUpdate ? 'RSVP modifié' : 'Nouveau RSVP'} — ${invite.prenom} ${invite.nom}`,
-    htmlContent: notificationHtml(invite.prenom, invite.nom, rsvp, isUpdate),
+    htmlContent: notificationHtml(invite.prenom, invite.nom, rsvp, isUpdate, invite.retourNoceAutorise),
   })
 }
