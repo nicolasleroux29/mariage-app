@@ -5,6 +5,8 @@ import FadeIn from '@/components/FadeIn'
 const temoins = [
   {
     prenom: 'Mathieu',
+    photo: '/mathieu.jpg',
+    photoPosition: 'object-[center_20%]',
     role: 'Frère et témoin de Judith',
     bio: 'Quelques mots sur ce témoin à compléter.',
   },
@@ -20,11 +22,15 @@ const temoins = [
   },
   {
     prenom: 'Aude',
+    photo: '/aude.jpg',
+    photoPosition: 'object-[center_57%]',
     role: 'Amie et demoiselle d\'honneur de Judith',
     bio: 'Quelques mots sur cette demoiselle d\'honneur à compléter.',
   },
   {
     prenom: 'Camille',
+    photo: '/camille.jpg',
+    photoPosition: 'object-[center_15%]',
     role: 'Amie et demoiselle d\'honneur de Judith',
     bio: 'Quelques mots sur cette demoiselle d\'honneur à compléter.',
   },
@@ -81,11 +87,23 @@ export default function PresentationPage() {
                 {temoins.map((temoin, i) => (
                   <div key={i} className="bg-white rounded-xl p-8 flex flex-col items-center text-center gap-5">
                     <p className="font-medium text-[#E6C771]">{temoin.prenom}</p>
-                    <div className="w-24 h-24 rounded-full bg-[#D98287]/20 flex items-center justify-center">
-                      <span className="text-[#D98287] text-2xl font-light">
-                        {temoin.prenom[0]}
-                      </span>
-                    </div>
+                    {temoin.photo ? (
+                      <div className="w-32 h-32 rounded-full overflow-hidden shadow-sm">
+                        <Image
+                          src={temoin.photo}
+                          alt={temoin.prenom}
+                          width={128}
+                          height={128}
+                          className={`object-cover w-full h-full ${temoin.photoPosition}`}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-32 h-32 rounded-full bg-[#D98287]/20 flex items-center justify-center">
+                        <span className="text-[#D98287] text-2xl font-light">
+                          {temoin.prenom[0]}
+                        </span>
+                      </div>
+                    )}
                     <p className="text-xs text-[#D98287]">{temoin.role}</p>
                     <p className="text-base text-[#D98287] leading-loose">{temoin.bio}</p>
                   </div>

@@ -10,11 +10,11 @@ export default function HomePage() {
       <main>
         <section className="relative overflow-hidden min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 text-center">
           <Image
-            src="/optimizedyannjudith.png"
+            src="/yannetjudith.jpg"
             alt="Yann & Judith"
             fill
             sizes="100vw"
-            className="object-cover object-[32%_40%]"
+            className="object-cover object-[75%_55%]"
             priority
           />
           <div className="absolute inset-0 bg-[#FDF5EA]/75" />
